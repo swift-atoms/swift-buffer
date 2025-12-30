@@ -11,6 +11,7 @@ struct BufferAlignedEmptyBufferTests {
         let buffer = try Buffer.Aligned(byteCount: 0, alignment: 8)
         buffer.withUnsafeBytes { ptr in
             #expect(ptr.baseAddress != nil)
+            // swiftlint:disable:next empty_count
             #expect(ptr.count == 0)
         }
     }
@@ -19,6 +20,7 @@ struct BufferAlignedEmptyBufferTests {
     func emptyBufferBytesSpan() throws {
         let buffer = try Buffer.Aligned(byteCount: 0, alignment: 8)
         let span = buffer.bytes
+        // swiftlint:disable:next empty_count
         #expect(span.count == 0)
     }
 

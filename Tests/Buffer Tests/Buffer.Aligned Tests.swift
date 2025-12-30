@@ -111,6 +111,7 @@ extension Buffer.Aligned.Test.EdgeCase {
     @Test("allows zero size (empty buffer)")
     func allowsZeroSize() throws {
         let buffer = try Buffer.Aligned(byteCount: 0, alignment: 512)
+        // swiftlint:disable:next empty_count
         #expect(buffer.count == 0)
         #expect(buffer.alignment == 512)
     }

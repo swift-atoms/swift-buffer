@@ -120,6 +120,6 @@ jobs:
           restore-keys: windows-swift62-spm-
 
       # Note: swift test builds automatically
-      # -Xswiftc -gnone works around Swift 6.2.1 Windows compiler crash in debug info verifier
+      # Release mode + -gnone works around Swift 6.2.1 Windows compiler crash in debug info verifier
       - name: Test
-        run: swift test -c debug -Xswiftc -gnone
+        run: swift test -c release -Xswiftc -gnone
