@@ -106,13 +106,14 @@ extension Buffer {
         deinit {
             // Don't free the shared page-aligned sentinel (used for empty buffers with alignment <= pageSize)
             // Empty buffers with alignment > pageSize have their own allocation that must be freed
-            if bytePointer == emptyBufferSentinel { return }
-
-            #if os(Windows)
-                _aligned_free(UnsafeMutableRawPointer(bytePointer))
-            #else
-                free(UnsafeMutableRawPointer(bytePointer))
-            #endif
+            // Note: Structured as if-else to work around Swift 6.2.1 Windows MoveOnlyChecker crash
+            if bytePointer != emptyBufferSentinel {
+                #if os(Windows)
+                    _aligned_free(UnsafeMutableRawPointer(bytePointer))
+                #else
+                    free(UnsafeMutableRawPointer(bytePointer))
+                #endif
+            }
         }
     }
 }
