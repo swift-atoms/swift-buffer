@@ -194,8 +194,8 @@ extension Buffer.BinaryConformance.Test.Unit {
             writerIndex: Position(20)
         )
 
-        #expect(cursor.readableCount.rawValue == 20)
-        #expect(cursor.writableCount.rawValue == 12)
+        #expect(cursor.readableCount == 20)
+        #expect(cursor.writableCount == 12)
         #expect(cursor.isReadable == true)
         #expect(cursor.isWritable == true)
 
@@ -215,7 +215,7 @@ extension Buffer.BinaryConformance.Test.Unit {
         // Move reader forward
         try cursor.moveReaderIndex(by: Offset(25))
         #expect(cursor.readerIndex.rawValue == 25)
-        #expect(cursor.readableCount.rawValue == 25)
+        #expect(cursor.readableCount == 25)
 
         // Reset
         cursor.reset()

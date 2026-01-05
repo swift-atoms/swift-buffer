@@ -71,7 +71,7 @@ extension Buffer.Aligned.Byte {
     public func at(
         _ position: Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>
     ) throws(Binary.Error) -> UInt8 {
-        let index = position._rawValue
+        let index = position.rawValue
         guard index >= 0, index < count else {
             throw .bounds(
                 .init(
@@ -97,7 +97,7 @@ extension Buffer.Aligned.Byte {
         __unchecked: Void = (),
         _ position: Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>
     ) -> UInt8 {
-        let index = position._rawValue
+        let index = position.rawValue
         precondition(index >= 0 && index < count, "Position out of bounds")
         return pointer[index]
     }
@@ -117,7 +117,7 @@ extension Buffer.Aligned.Byte {
         _ value: UInt8,
         at position: Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>
     ) throws(Binary.Error) {
-        let index = position._rawValue
+        let index = position.rawValue
         guard index >= 0, index < count else {
             throw .bounds(
                 .init(
@@ -144,7 +144,7 @@ extension Buffer.Aligned.Byte {
         _ value: UInt8,
         at position: Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>
     ) {
-        let index = position._rawValue
+        let index = position.rawValue
         precondition(index >= 0 && index < count, "Position out of bounds")
         pointer[index] = value
     }
@@ -164,12 +164,12 @@ extension Buffer.Aligned {
     @inlinable
     public subscript(position: Binary.Position<Scalar, Space>) -> UInt8 {
         get {
-            let index = position._rawValue
+            let index = position.rawValue
             precondition(index >= 0 && index < count, "Position out of bounds")
             return bytePointer[index]
         }
         set {
-            let index = position._rawValue
+            let index = position.rawValue
             precondition(index >= 0 && index < count, "Position out of bounds")
             bytePointer[index] = newValue
         }
@@ -191,8 +191,8 @@ extension Buffer.Aligned {
         in range: Range<Binary.Position<Scalar, Space>>,
         _ body: (Span<UInt8>) throws(E) -> R
     ) throws(BytesRangeError<E>) -> R {
-        let lower = range.lowerBound._rawValue
-        let upper = range.upperBound._rawValue
+        let lower = range.lowerBound.rawValue
+        let upper = range.upperBound.rawValue
 
         guard lower >= 0 else {
             throw .bounds(.negative(.init(field: .reader, value: lower)))
@@ -249,8 +249,8 @@ extension Buffer.Aligned {
         in range: Range<Binary.Position<Scalar, Space>>,
         _ body: (Span<UInt8>) throws(E) -> R
     ) throws(E) -> R {
-        let lower = range.lowerBound._rawValue
-        let upper = range.upperBound._rawValue
+        let lower = range.lowerBound.rawValue
+        let upper = range.upperBound.rawValue
         precondition(lower >= 0 && lower <= upper && upper <= count)
         let span = unsafe Span(
             _unsafeStart: bytePointer.advanced(by: lower),
