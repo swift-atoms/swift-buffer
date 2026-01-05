@@ -351,6 +351,14 @@ extension Buffer.Aligned {
 
 // MARK: - Protocol Conformances
 
+extension Buffer.Aligned {
+    /// Address space marker for buffer memory positions.
+    public enum Space {}
+
+    /// Scalar type for index arithmetic (default Int).
+    public typealias Scalar = Int
+}
+
 // Binary.Mutable refines Binary.Contiguous, so conforming to Mutable
 // automatically satisfies the Contiguous requirement.
 extension Buffer.Aligned: Binary.Mutable {}
