@@ -1,3 +1,4 @@
+import Binary
 import Testing
 
 @testable import Buffer
@@ -8,7 +9,7 @@ import Testing
 struct BufferAlignedEmptyBufferTests {
     @Test("empty buffer has valid pointer")
     func emptyBufferPointer() throws {
-        let buffer = try Buffer.Aligned(byteCount: 0, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 0, alignment: .doubleWord)
         buffer.withUnsafeBytes { ptr in
             #expect(ptr.baseAddress != nil)
             // swiftlint:disable:next empty_count
@@ -18,7 +19,7 @@ struct BufferAlignedEmptyBufferTests {
 
     @Test("empty buffer bytes span has zero count")
     func emptyBufferBytesSpan() throws {
-        let buffer = try Buffer.Aligned(byteCount: 0, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 0, alignment: .doubleWord)
         let span = buffer.bytes
         // swiftlint:disable:next empty_count
         #expect(span.count == 0)
@@ -26,7 +27,7 @@ struct BufferAlignedEmptyBufferTests {
 
     @Test("empty buffer withRawSpan has zero byteCount")
     func emptyBufferRawBytesSpan() throws {
-        let buffer = try Buffer.Aligned(byteCount: 0, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 0, alignment: .doubleWord)
         buffer.withRawSpan { span in
             #expect(span.byteCount == 0)
         }
@@ -34,9 +35,9 @@ struct BufferAlignedEmptyBufferTests {
 
     @Test("multiple empty buffers share sentinel")
     func emptyBuffersShareSentinel() throws {
-        let buffer1 = try Buffer.Aligned(byteCount: 0, alignment: 8)
-        let buffer2 = try Buffer.Aligned(byteCount: 0, alignment: 16)
-        let buffer3 = try Buffer.Aligned(byteCount: 0, alignment: 4096)
+        let buffer1 = try Buffer.Aligned(byteCount: 0, alignment: .doubleWord)
+        let buffer2 = try Buffer.Aligned(byteCount: 0, alignment: .quadWord)
+        let buffer3 = try Buffer.Aligned(byteCount: 0, alignment: .page4096)
 
         var ptr1: UnsafeRawPointer?
         var ptr2: UnsafeRawPointer?
@@ -57,21 +58,21 @@ struct BufferAlignedEmptyBufferTests {
 struct BufferAlignedSpanTests {
     @Test("bytes returns Span with correct count")
     func bytesSpan() throws {
-        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: .doubleWord)
         let span = buffer.bytes
         #expect(span.count == 1024)
     }
 
     @Test("mutableBytes returns MutableSpan with correct count")
     func mutableBytesSpan() throws {
-        var buffer = try Buffer.Aligned(byteCount: 1024, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 1024, alignment: .doubleWord)
         let span = buffer.mutableBytes
         #expect(span.count == 1024)
     }
 
     @Test("mutableBytes allows writing and reading back")
     func mutableBytesWriteRead() throws {
-        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: .doubleWord)
         var span = buffer.mutableBytes
         span[0] = 0xDE
         span[1] = 0xAD
@@ -86,7 +87,7 @@ struct BufferAlignedSpanTests {
 
     @Test("bytes span matches withUnsafeBytes content")
     func bytesMatchesUnsafeBytes() throws {
-        var buffer = try Buffer.Aligned(byteCount: 256, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 256, alignment: .doubleWord)
 
         // Write pattern
         buffer.withUnsafeMutableBytes { ptr in
@@ -109,7 +110,7 @@ struct BufferAlignedSpanTests {
 struct BufferAlignedRawSpanTests {
     @Test("withRawSpan provides RawSpan with correct byteCount")
     func rawBytesSpan() throws {
-        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: .doubleWord)
         buffer.withRawSpan { span in
             #expect(span.byteCount == 1024)
         }
@@ -117,7 +118,7 @@ struct BufferAlignedRawSpanTests {
 
     @Test("withMutableRawSpan provides MutableRawSpan with correct byteCount")
     func mutableRawBytesSpan() throws {
-        var buffer = try Buffer.Aligned(byteCount: 1024, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 1024, alignment: .doubleWord)
         buffer.withMutableRawSpan { span in
             #expect(span.byteCount == 1024)
         }

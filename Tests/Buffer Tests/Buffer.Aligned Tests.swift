@@ -1,3 +1,4 @@
+import Binary
 import StandardsTestSupport
 import Testing
 
@@ -12,14 +13,14 @@ extension Buffer.Aligned {
 extension Buffer.Aligned.Test.Unit {
     @Test("allocates with valid parameters")
     func allocatesWithValidParameters() throws {
-        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: 512)
+        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: .sector512)
         #expect(buffer.count == 1024)
-        #expect(buffer.alignment == 512)
+        #expect(buffer.alignment == .sector512)
     }
 
     @Test("allocates zeroed buffer")
     func allocatesZeroedBuffer() throws {
-        let buffer = try Buffer.Aligned.zeroed(byteCount: 1024, alignment: 512)
+        let buffer = try Buffer.Aligned.zeroed(byteCount: 1024, alignment: .sector512)
         buffer.withUnsafeBytes { ptr in
             for byte in ptr {
                 #expect(byte == 0)
@@ -31,22 +32,23 @@ extension Buffer.Aligned.Test.Unit {
     func allocatesPageAlignedBuffer() throws {
         let buffer = try Buffer.Aligned.pageAligned(byteCount: 4096)
         #expect(buffer.count == 4096)
-        #expect(buffer.alignment == Buffer.Memory.pageSize)
-        let aligned = buffer.isAligned(to: Buffer.Memory.pageSize)
+        #expect(buffer.alignment == Buffer.Memory.pageAlignment)
+        let aligned = buffer.isAligned(to: Buffer.Memory.pageAlignment)
         #expect(aligned)
     }
 
     @Test("isAligned returns true for guaranteed alignment")
     func isAlignedToGuaranteed() throws {
-        let buffer = try Buffer.Aligned(byteCount: 4096, alignment: 512)
-        let aligned = buffer.isAligned(to: 512)
+        let buffer = try Buffer.Aligned(byteCount: 4096, alignment: .sector512)
+        let aligned = buffer.isAligned(to: .sector512)
         #expect(aligned)
     }
 
     @Test("isAligned returns true for smaller alignments")
     func isAlignedToSmaller() throws {
-        let buffer = try Buffer.Aligned(byteCount: 4096, alignment: 512)
-        for boundary in [1, 2, 4, 8, 16, 32, 64, 128, 256] {
+        let buffer = try Buffer.Aligned(byteCount: 4096, alignment: .sector512)
+        let alignments: [Binary.Alignment] = [.byte, .halfWord, .word, .doubleWord, .quadWord]
+        for boundary in alignments {
             let aligned = buffer.isAligned(to: boundary)
             #expect(aligned)
         }
@@ -54,7 +56,7 @@ extension Buffer.Aligned.Test.Unit {
 
     @Test("withUnsafeBytes provides correct buffer")
     func withUnsafeBytesAccess() throws {
-        var buffer = try Buffer.Aligned(byteCount: 1024, alignment: 512)
+        var buffer = try Buffer.Aligned(byteCount: 1024, alignment: .sector512)
 
         buffer.withUnsafeMutableBytes { ptr in
             for i in 0..<ptr.count {
@@ -72,7 +74,7 @@ extension Buffer.Aligned.Test.Unit {
 
     @Test("withUnsafeMutableBytes allows modification")
     func withUnsafeMutableBytesAccess() throws {
-        var buffer = try Buffer.Aligned.zeroed(byteCount: 1024, alignment: 512)
+        var buffer = try Buffer.Aligned.zeroed(byteCount: 1024, alignment: .sector512)
 
         buffer.withUnsafeMutableBytes { ptr in
             ptr[0] = 0xAB
@@ -89,7 +91,7 @@ extension Buffer.Aligned.Test.Unit {
     func typedThrowingClosure() throws {
         enum TestError: Error { case expected }
 
-        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: 512)
+        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: .sector512)
 
         #expect(throws: TestError.expected) {
             try buffer.withUnsafeBytes { (_: UnsafeRawBufferPointer) throws(TestError) in
@@ -98,9 +100,16 @@ extension Buffer.Aligned.Test.Unit {
         }
     }
 
-    @Test("accepts power-of-2 alignments", arguments: [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096])
-    func acceptsValidAlignment(alignment: Int) throws {
-        let buffer = try Buffer.Aligned(byteCount: alignment, alignment: alignment)
+    @Test(
+        "accepts power-of-2 alignments",
+        arguments: [
+            Binary.Alignment.doubleWord, .quadWord,
+            .sector512, .`1024`, .page4096
+        ]
+    )
+    func acceptsValidAlignment(alignment: Binary.Alignment) throws {
+        let size: Int = alignment.magnitude()
+        let buffer = try Buffer.Aligned(byteCount: size, alignment: alignment)
         #expect(buffer.alignment == alignment)
     }
 }
@@ -110,51 +119,25 @@ extension Buffer.Aligned.Test.Unit {
 extension Buffer.Aligned.Test.EdgeCase {
     @Test("allows zero size (empty buffer)")
     func allowsZeroSize() throws {
-        let buffer = try Buffer.Aligned(byteCount: 0, alignment: 512)
+        let buffer = try Buffer.Aligned(byteCount: 0, alignment: .sector512)
         // swiftlint:disable:next empty_count
         #expect(buffer.count == 0)
-        #expect(buffer.alignment == 512)
+        #expect(buffer.alignment == .sector512)
     }
 
     @Test("rejects negative size")
     func rejectsNegativeSize() {
         #expect(throws: Buffer.Aligned.Error.invalidSize) {
-            _ = try Buffer.Aligned(byteCount: -1, alignment: 512)
+            _ = try Buffer.Aligned(byteCount: -1, alignment: .sector512)
         }
     }
 
-    @Test("rejects non-power-of-2 alignment", arguments: [3, 5, 6, 7, 9, 10, 12, 15])
-    func rejectsInvalidAlignment(alignment: Int) {
-        #expect(throws: Buffer.Aligned.Error.invalidAlignment) {
-            _ = try Buffer.Aligned(byteCount: 1024, alignment: alignment)
-        }
-    }
-
-    @Test("rejects alignment below platform minimum", arguments: [1, 2, 4])
-    func rejectsAlignmentBelowMinimum(alignment: Int) {
-        // On 64-bit platforms, minimum alignment is 8 (sizeof(void*))
-        // posix_memalign requires alignment >= sizeof(void*)
-        #expect(throws: Buffer.Aligned.Error.invalidAlignment) {
-            _ = try Buffer.Aligned(byteCount: 1024, alignment: alignment)
-        }
-    }
-
-    @Test("isAligned returns false for invalid boundaries")
-    func isAlignedRejectsInvalid() throws {
-        let buffer = try Buffer.Aligned(byteCount: 4096, alignment: 512)
-        let notAlignedTo0 = buffer.isAligned(to: 0)
-        let notAlignedToNeg1 = buffer.isAligned(to: -1)
-        let notAlignedTo3 = buffer.isAligned(to: 3)
-        let notAlignedTo5 = buffer.isAligned(to: 5)
-        #expect(!notAlignedTo0)
-        #expect(!notAlignedToNeg1)
-        #expect(!notAlignedTo3)
-        #expect(!notAlignedTo5)
-    }
+    // Note: Tests for invalid alignment (non-power-of-2, below minimum) are no longer needed
+    // because Binary.Alignment guarantees the value is a valid power of 2 at compile time.
 
     @Test("withMisalignedView creates offset pointer")
     func misalignedViewOffset() throws {
-        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: 512)
+        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: .sector512)
 
         buffer.withMisalignedView(offset: 1) { misaligned in
             #expect(misaligned.count == 1023)
@@ -165,7 +148,7 @@ extension Buffer.Aligned.Test.EdgeCase {
 
     @Test("withMisalignedMutableView creates offset pointer")
     func misalignedMutableViewOffset() throws {
-        var buffer = try Buffer.Aligned.zeroed(byteCount: 1024, alignment: 512)
+        var buffer = try Buffer.Aligned.zeroed(byteCount: 1024, alignment: .sector512)
 
         buffer.withMisalignedMutableView(offset: 7) { misaligned in
             #expect(misaligned.count == 1017)

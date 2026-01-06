@@ -15,7 +15,7 @@ struct BufferGrowableTests {
 
         @Test("creates buffer with minimum capacity")
         func createsWithMinimumCapacity() throws {
-            let buffer = try Buffer.Growable(minimumCapacity: 64, alignment: 8)
+            let buffer = try Buffer.Growable(minimumCapacity: 64, alignment: .doubleWord)
 
             #expect(buffer.count >= 64)
             #expect(buffer.capacity >= 64)
@@ -25,7 +25,7 @@ struct BufferGrowableTests {
         func createsZeroedBuffer() throws {
             let buffer = try Buffer.Growable.zeroed(
                 minimumCapacity: 32,
-                alignment: 8
+                alignment: .doubleWord
             )
 
             buffer.withUnsafeBytes { ptr in
@@ -37,11 +37,11 @@ struct BufferGrowableTests {
 
         @Test("respects alignment requirement")
         func respectsAlignment() throws {
-            let buffer = try Buffer.Growable(minimumCapacity: 100, alignment: 64)
+            let buffer = try Buffer.Growable(minimumCapacity: 100, alignment: .quadWord)
 
             buffer.withUnsafeBytes { ptr in
                 let address = UInt(bitPattern: ptr.baseAddress!)
-                #expect(address % 64 == 0)
+                #expect(address % 16 == 0)
             }
         }
 
@@ -49,7 +49,7 @@ struct BufferGrowableTests {
         func storesGrowthPolicy() throws {
             let buffer = try Buffer.Growable(
                 minimumCapacity: 32,
-                alignment: 8,
+                alignment: .doubleWord,
                 growthPolicy: .exact
             )
 
@@ -67,7 +67,7 @@ struct BufferGrowableTests {
 
         @Test("ensureCapacity is no-op when sufficient")
         func ensureCapacityNoOp() throws {
-            var buffer = try Buffer.Growable(minimumCapacity: 100, alignment: 8)
+            var buffer = try Buffer.Growable(minimumCapacity: 100, alignment: .doubleWord)
             let originalCapacity = buffer.capacity
 
             try buffer.ensureCapacity(minimum: 50)
@@ -77,7 +77,7 @@ struct BufferGrowableTests {
 
         @Test("ensureCapacity grows buffer")
         func ensureCapacityGrows() throws {
-            var buffer = try Buffer.Growable(minimumCapacity: 32, alignment: 8)
+            var buffer = try Buffer.Growable(minimumCapacity: 32, alignment: .doubleWord)
 
             try buffer.ensureCapacity(minimum: 256)
 
@@ -88,7 +88,7 @@ struct BufferGrowableTests {
         func ensureCapacityPreservesBytes() throws {
             var buffer = try Buffer.Growable.zeroed(
                 minimumCapacity: 16,
-                alignment: 8
+                alignment: .doubleWord
             )
 
             // Write some test data
@@ -111,7 +111,7 @@ struct BufferGrowableTests {
 
         @Test("reserveDiscardingContents grows without preserving")
         func reserveDiscardingContentsGrows() throws {
-            var buffer = try Buffer.Growable(minimumCapacity: 32, alignment: 8)
+            var buffer = try Buffer.Growable(minimumCapacity: 32, alignment: .doubleWord)
 
             try buffer.reserveDiscardingContents(minimum: 256)
 
@@ -120,7 +120,7 @@ struct BufferGrowableTests {
 
         @Test("reserveDiscardingContents is no-op when sufficient")
         func reserveDiscardingContentsNoOp() throws {
-            var buffer = try Buffer.Growable(minimumCapacity: 100, alignment: 8)
+            var buffer = try Buffer.Growable(minimumCapacity: 100, alignment: .doubleWord)
             let originalCapacity = buffer.capacity
 
             try buffer.reserveDiscardingContents(minimum: 50)
@@ -130,7 +130,7 @@ struct BufferGrowableTests {
 
         @Test("unchecked ensureCapacity works")
         func uncheckedEnsureCapacity() throws {
-            var buffer = try Buffer.Growable(minimumCapacity: 32, alignment: 8)
+            var buffer = try Buffer.Growable(minimumCapacity: 32, alignment: .doubleWord)
 
             buffer.ensureCapacity(__unchecked: (), minimum: 256)
 
@@ -147,7 +147,7 @@ struct BufferGrowableTests {
         func doublingPolicy() throws {
             var buffer = try Buffer.Growable(
                 minimumCapacity: 32,
-                alignment: 8,
+                alignment: .doubleWord,
                 growthPolicy: .doubling
             )
 
@@ -161,7 +161,7 @@ struct BufferGrowableTests {
         func exactPolicy() throws {
             var buffer = try Buffer.Growable(
                 minimumCapacity: 32,
-                alignment: 8,
+                alignment: .doubleWord,
                 growthPolicy: .exact
             )
 
@@ -174,7 +174,7 @@ struct BufferGrowableTests {
         func factorPolicy() throws {
             var buffer = try Buffer.Growable(
                 minimumCapacity: 100,
-                alignment: 8,
+                alignment: .doubleWord,
                 growthPolicy: .factor(1.5)
             )
 
@@ -187,8 +187,8 @@ struct BufferGrowableTests {
         func pageAlignedPolicy() throws {
             var buffer = try Buffer.Growable(
                 minimumCapacity: 100,
-                alignment: 8,
-                growthPolicy: .pageAligned(4096)
+                alignment: .doubleWord,
+                growthPolicy: .pageAligned(.page4096)
             )
 
             try buffer.ensureCapacity(minimum: 4097)
@@ -207,7 +207,7 @@ struct BufferGrowableTests {
         func withUnsafeBytesReadAccess() throws {
             var buffer = try Buffer.Growable.zeroed(
                 minimumCapacity: 16,
-                alignment: 8
+                alignment: .doubleWord
             )
 
             buffer.withUnsafeMutableBytes { ptr in
@@ -224,7 +224,7 @@ struct BufferGrowableTests {
 
         @Test("withUnsafeMutableBytes allows writing")
         func withUnsafeMutableBytesWriteAccess() throws {
-            var buffer = try Buffer.Growable(minimumCapacity: 16, alignment: 8)
+            var buffer = try Buffer.Growable(minimumCapacity: 16, alignment: .doubleWord)
 
             buffer.withUnsafeMutableBytes { ptr in
                 for i in 0..<16 {
@@ -241,7 +241,7 @@ struct BufferGrowableTests {
 
         @Test("bytes span has correct count")
         func bytesSpanCount() throws {
-            let buffer = try Buffer.Growable(minimumCapacity: 64, alignment: 8)
+            let buffer = try Buffer.Growable(minimumCapacity: 64, alignment: .doubleWord)
 
             let span = buffer.bytes
             #expect(span.count == buffer.count)
@@ -251,7 +251,7 @@ struct BufferGrowableTests {
         func mutableBytesSpanModification() throws {
             var buffer = try Buffer.Growable.zeroed(
                 minimumCapacity: 16,
-                alignment: 8
+                alignment: .doubleWord
             )
 
             var span = buffer.mutableBytes
@@ -268,7 +268,7 @@ struct BufferGrowableTests {
 
         @Test("conforms to Binary.Mutable")
         func conformsToBinaryMutable() throws {
-            let buffer = try Buffer.Growable(minimumCapacity: 32, alignment: 8)
+            let buffer = try Buffer.Growable(minimumCapacity: 32, alignment: .doubleWord)
 
             func acceptsMutable<T: Binary.Mutable & ~Copyable>(_ storage: borrowing T) {
                 #expect(storage.count >= 0)
@@ -282,7 +282,7 @@ struct BufferGrowableTests {
             typealias Position = Binary.Position<Buffer.Growable.Scalar, Buffer.Growable.Space>
             typealias Offset = Binary.Offset<Buffer.Growable.Scalar, Buffer.Growable.Space>
 
-            let buffer = try Buffer.Growable.zeroed(minimumCapacity: 64, alignment: 8)
+            let buffer = try Buffer.Growable.zeroed(minimumCapacity: 64, alignment: .doubleWord)
             var cursor = try Binary.Cursor(storage: buffer)
 
             try cursor.moveWriterIndex(by: Offset(32))
@@ -295,7 +295,7 @@ struct BufferGrowableTests {
 
         @Test("count equals capacity")
         func countEqualsCapacity() throws {
-            let buffer = try Buffer.Growable(minimumCapacity: 100, alignment: 8)
+            let buffer = try Buffer.Growable(minimumCapacity: 100, alignment: .doubleWord)
 
             #expect(buffer.count == buffer.capacity)
         }
@@ -310,22 +310,22 @@ struct BufferGrowableTests {
         func alignmentPreservedAfterGrowth() throws {
             var buffer = try Buffer.Growable(
                 minimumCapacity: 32,
-                alignment: 64
+                alignment: .quadWord
             )
 
             try buffer.ensureCapacity(minimum: 1024)
 
             buffer.withUnsafeBytes { ptr in
                 let address = UInt(bitPattern: ptr.baseAddress!)
-                #expect(address % 64 == 0)
+                #expect(address % 16 == 0)
             }
         }
 
         @Test("alignment property returns correct value")
         func alignmentPropertyCorrect() throws {
-            let buffer = try Buffer.Growable(minimumCapacity: 32, alignment: 128)
+            let buffer = try Buffer.Growable(minimumCapacity: 32, alignment: .sector512)
 
-            #expect(buffer.alignment == 128)
+            #expect(buffer.alignment == .sector512)
         }
     }
 }

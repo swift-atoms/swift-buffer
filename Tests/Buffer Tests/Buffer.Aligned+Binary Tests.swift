@@ -18,7 +18,7 @@ extension Buffer {
 extension Buffer.BinaryConformance.Test.Unit {
     @Test("byte.at reads correct value")
     func byteAtReadsValue() throws {
-        var buffer = try Buffer.Aligned(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 16, alignment: .doubleWord)
         buffer.withUnsafeMutableBytes { ptr in
             ptr[5] = 0xAB
         }
@@ -30,7 +30,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("byte.set writes correct value")
     func byteSetWritesValue() throws {
-        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: .doubleWord)
 
         let position = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(7)
         try buffer.byte.set(0xCD, at: position)
@@ -42,7 +42,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("byte.at throws on out of bounds")
     func byteAtThrowsOutOfBounds() throws {
-        let buffer = try Buffer.Aligned(byteCount: 8, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 8, alignment: .doubleWord)
 
         let position = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(10)
         #expect(throws: Binary.Error.self) {
@@ -52,7 +52,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("byte.set throws on out of bounds")
     func byteSetThrowsOutOfBounds() throws {
-        let buffer = try Buffer.Aligned.zeroed(byteCount: 8, alignment: 8)
+        let buffer = try Buffer.Aligned.zeroed(byteCount: 8, alignment: .doubleWord)
 
         let position = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(10)
         #expect(throws: Binary.Error.self) {
@@ -62,7 +62,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("byte.at throws on negative position")
     func byteAtThrowsNegativePosition() throws {
-        let buffer = try Buffer.Aligned(byteCount: 8, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 8, alignment: .doubleWord)
 
         let position = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(-1)
         #expect(throws: Binary.Error.self) {
@@ -72,7 +72,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("unchecked byte.at reads correct value")
     func uncheckedByteAtReadsValue() throws {
-        var buffer = try Buffer.Aligned(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 16, alignment: .doubleWord)
         buffer.withUnsafeMutableBytes { ptr in
             ptr[3] = 0x99
         }
@@ -84,7 +84,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("unchecked byte.set writes correct value")
     func uncheckedByteSetWritesValue() throws {
-        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: .doubleWord)
 
         let position = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(11)
         buffer.byte.set(__unchecked: (), 0x77, at: position)
@@ -96,7 +96,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("subscript reads correct value")
     func subscriptReadsValue() throws {
-        var buffer = try Buffer.Aligned(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 16, alignment: .doubleWord)
         buffer.withUnsafeMutableBytes { ptr in
             ptr[2] = 0xEE
         }
@@ -107,7 +107,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("subscript writes correct value")
     func subscriptWritesValue() throws {
-        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned.zeroed(byteCount: 16, alignment: .doubleWord)
 
         let position = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(9)
         buffer[position] = 0xDD
@@ -123,7 +123,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 extension Buffer.BinaryConformance.Test.Unit {
     @Test("withBytes(in:) provides correct span")
     func withBytesInRangeCorrectSpan() throws {
-        var buffer = try Buffer.Aligned(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 16, alignment: .doubleWord)
         buffer.withUnsafeMutableBytes { ptr in
             for i in 0..<16 { ptr[i] = UInt8(i) }
         }
@@ -141,7 +141,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("withBytes(in:) throws on out of bounds")
     func withBytesInRangeThrowsOutOfBounds() throws {
-        let buffer = try Buffer.Aligned(byteCount: 8, alignment: 8)
+        let buffer = try Buffer.Aligned(byteCount: 8, alignment: .doubleWord)
 
         let start = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(4)
         let end = Binary.Position<Buffer.Aligned.Scalar, Buffer.Aligned.Space>(12)
@@ -153,7 +153,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("unchecked withBytes(in:) provides correct span")
     func uncheckedWithBytesInRange() throws {
-        var buffer = try Buffer.Aligned(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 16, alignment: .doubleWord)
         buffer.withUnsafeMutableBytes { ptr in
             for i in 0..<16 { ptr[i] = UInt8(i * 2) }
         }
@@ -177,7 +177,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("Binary.Cursor can be created over Buffer.Aligned")
     func cursorCreation() throws {
-        let buffer = try Buffer.Aligned.zeroed(byteCount: 64, alignment: 16)
+        let buffer = try Buffer.Aligned.zeroed(byteCount: 64, alignment: .quadWord)
         let cursor = try Binary.Cursor(storage: buffer)
 
         #expect(cursor.count == 64)
@@ -187,7 +187,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("Binary.Cursor tracks readable/writable counts")
     func cursorReadableWritable() throws {
-        let buffer = try Buffer.Aligned.zeroed(byteCount: 32, alignment: 8)
+        let buffer = try Buffer.Aligned.zeroed(byteCount: 32, alignment: .doubleWord)
         var cursor = try Binary.Cursor(
             storage: buffer,
             readerIndex: Position(0),
@@ -205,7 +205,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("Binary.Cursor move operations work")
     func cursorMoveOperations() throws {
-        let buffer = try Buffer.Aligned.zeroed(byteCount: 100, alignment: 16)
+        let buffer = try Buffer.Aligned.zeroed(byteCount: 100, alignment: .quadWord)
         var cursor = try Binary.Cursor(storage: buffer)
 
         // Move writer forward
@@ -225,7 +225,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("Binary.Cursor enforces invariants")
     func cursorInvariantEnforcement() throws {
-        let buffer = try Buffer.Aligned.zeroed(byteCount: 32, alignment: 8)
+        let buffer = try Buffer.Aligned.zeroed(byteCount: 32, alignment: .doubleWord)
         var cursor = try Binary.Cursor(
             storage: buffer,
             readerIndex: Position(10),
@@ -250,7 +250,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("Binary.Cursor provides region access")
     func cursorRegionAccess() throws {
-        var buffer = try Buffer.Aligned(byteCount: 16, alignment: 8)
+        var buffer = try Buffer.Aligned(byteCount: 16, alignment: .doubleWord)
         buffer.withUnsafeMutableBytes { ptr in
             for i in 0..<16 { ptr[i] = UInt8(i) }
         }
@@ -286,7 +286,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 extension Buffer.BinaryConformance.Test.Unit {
     @Test("Buffer.Aligned conforms to Binary.Contiguous")
     func alignedConformsToContiguous() throws {
-        var buffer = try Buffer.Aligned(byteCount: 16, alignment: 16)
+        var buffer = try Buffer.Aligned(byteCount: 16, alignment: .quadWord)
 
         buffer.withUnsafeMutableBytes { ptr in
             for i in 0..<16 {
@@ -303,7 +303,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("Buffer.Aligned conforms to Binary.Mutable")
     func alignedConformsToMutable() throws {
-        var buffer = try Buffer.Aligned.zeroed(byteCount: 8, alignment: 8)
+        var buffer = try Buffer.Aligned.zeroed(byteCount: 8, alignment: .doubleWord)
 
         buffer.withUnsafeMutableBytes { ptr in
             ptr[0] = 0xFF
@@ -316,7 +316,7 @@ extension Buffer.BinaryConformance.Test.Unit {
 
     @Test("Buffer.Aligned count satisfies Binary.Contiguous requirement")
     func alignedCountProperty() throws {
-        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: 512)
+        let buffer = try Buffer.Aligned(byteCount: 1024, alignment: .sector512)
         #expect(buffer.count == 1024)
 
         buffer.withUnsafeBytes { ptr in
@@ -334,7 +334,7 @@ extension Buffer.BinaryConformance.Test.Unit {
             }
         }
 
-        var aligned = try Buffer.Aligned(byteCount: 16, alignment: 16)
+        var aligned = try Buffer.Aligned(byteCount: 16, alignment: .quadWord)
         aligned.withUnsafeMutableBytes { $0[0] = 0x44 }
 
         #expect(readFirstByte(aligned) == 0x44)
@@ -353,7 +353,7 @@ extension Buffer.BinaryConformance.Test.Unit {
             }
         }
 
-        var aligned = try Buffer.Aligned.zeroed(byteCount: 16, alignment: 16)
+        var aligned = try Buffer.Aligned.zeroed(byteCount: 16, alignment: .quadWord)
 
         writeFirstByte(&aligned, value: 0xCC)
 
