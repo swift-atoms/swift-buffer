@@ -64,59 +64,211 @@ extension Buffer {
     }
 }
 
-// MARK: - Enqueue / Dequeue
+// MARK: - Push Accessor
 
 extension Buffer.Ring {
-    /// Enqueue an element at the tail.
+    /// Nested accessor for push operations.
     ///
-    /// - Parameter element: The element to enqueue.
-    /// - Returns: `true` if enqueued, `false` if buffer is full.
+    /// ```swift
+    /// var ring = Buffer.Ring<Int>(capacity: 10)
+    /// ring.push(1)           // push to back (default)
+    /// ring.push.back(2)      // explicit back
+    /// ring.push.back(unchecked: 3)  // unchecked variant
+    /// ```
     @inlinable
-    public mutating func enqueue(_ element: Element) -> Bool {
-        guard !isFull else { return false }
-        storage[tail] = element
-        tail = (tail + 1) % capacity
-        _count += 1
+    public var push: Push {
+        _read {
+            yield Push(ring: self)
+        }
+        _modify {
+            var proxy = Push(ring: self)
+            self = Self(capacity: 1)  // Temporary placeholder
+            defer { self = proxy.ring }
+            yield &proxy
+        }
+    }
+}
+
+// MARK: - Push Type
+
+extension Buffer.Ring {
+    /// Namespace for push operations.
+    public struct Push {
+        @usableFromInline
+        var ring: Buffer.Ring<Element>
+
+        @usableFromInline
+        init(ring: Buffer.Ring<Element>) {
+            self.ring = ring
+        }
+    }
+}
+
+// MARK: - Push Operations
+
+extension Buffer.Ring.Push {
+    /// Pushes an element to the back (default).
+    ///
+    /// - Parameter element: The element to push.
+    /// - Returns: `true` if pushed, `false` if buffer is full.
+    @inlinable
+    @discardableResult
+    public mutating func callAsFunction(_ element: Element) -> Bool {
+        back(element)
+    }
+
+    /// Pushes an element to the back.
+    ///
+    /// - Parameter element: The element to push.
+    /// - Returns: `true` if pushed, `false` if buffer is full.
+    @inlinable
+    @discardableResult
+    public mutating func back(_ element: Element) -> Bool {
+        guard !ring.isFull else { return false }
+        ring.storage[ring.tail] = element
+        ring.tail = (ring.tail + 1) % ring.capacity
+        ring._count += 1
         return true
     }
 
-    /// Enqueue an element, trapping if full.
+    /// Pushes an element to the back, trapping if full.
     ///
-    /// Use when the caller has ensured capacity is available.
+    /// - Parameter element: The element to push.
     @inlinable
-    public mutating func enqueueUnchecked(_ element: Element) {
-        precondition(!isFull, "Ring buffer is full")
-        storage[tail] = element
-        tail = (tail + 1) % capacity
-        _count += 1
+    public mutating func back(unchecked element: Element) {
+        precondition(!ring.isFull, "Ring buffer is full")
+        ring.storage[ring.tail] = element
+        ring.tail = (ring.tail + 1) % ring.capacity
+        ring._count += 1
     }
+}
 
-    /// Dequeue an element from the head.
-    ///
-    /// - Returns: The dequeued element, or `nil` if empty.
-    @inlinable
-    public mutating func dequeue() -> Element? {
-        guard _count > 0 else { return nil }
-        let element = storage[head]
-        storage[head] = nil
-        head = (head + 1) % capacity
-        _count -= 1
-        return element
-    }
+// MARK: - Pop Accessor
 
-    /// Dequeue an element, trapping if empty.
+extension Buffer.Ring {
+    /// Nested accessor for pop operations.
     ///
-    /// Use when the caller has ensured an element is available.
+    /// ```swift
+    /// var ring: Buffer.Ring<Int> = ...
+    /// let x = ring.pop()         // pop from front (default, FIFO)
+    /// let y = ring.pop.front()   // explicit front
+    /// let z = ring.pop.back()    // pop from back (LIFO)
+    /// ```
     @inlinable
-    public mutating func dequeueUnchecked() -> Element {
-        precondition(_count > 0, "Ring buffer is empty")
-        guard let element = storage[head] else {
-            preconditionFailure("Ring buffer invariant violated: count=\(_count) but head slot is nil")
+    public var pop: Pop {
+        _read {
+            yield Pop(ring: self)
         }
-        storage[head] = nil
-        head = (head + 1) % capacity
-        _count -= 1
+        _modify {
+            var proxy = Pop(ring: self)
+            self = Self(capacity: 1)  // Temporary placeholder
+            defer { self = proxy.ring }
+            yield &proxy
+        }
+    }
+}
+
+// MARK: - Pop Type
+
+extension Buffer.Ring {
+    /// Namespace for pop operations.
+    public struct Pop {
+        @usableFromInline
+        var ring: Buffer.Ring<Element>
+
+        @usableFromInline
+        init(ring: Buffer.Ring<Element>) {
+            self.ring = ring
+        }
+    }
+}
+
+// MARK: - Pop Operations
+
+extension Buffer.Ring.Pop {
+    /// Pops from the front (default, FIFO order).
+    ///
+    /// - Returns: The oldest element, or `nil` if empty.
+    @inlinable
+    public mutating func callAsFunction() -> Element? {
+        front()
+    }
+
+    /// Pops from the front (FIFO order).
+    ///
+    /// - Returns: The oldest element, or `nil` if empty.
+    @inlinable
+    public mutating func front() -> Element? {
+        guard ring._count > 0 else { return nil }
+        let element = ring.storage[ring.head]
+        ring.storage[ring.head] = nil
+        ring.head = (ring.head + 1) % ring.capacity
+        ring._count -= 1
         return element
+    }
+
+    /// Pops from the back (LIFO order).
+    ///
+    /// - Returns: The newest element, or `nil` if empty.
+    @inlinable
+    public mutating func back() -> Element? {
+        guard ring._count > 0 else { return nil }
+        let lastIndex = (ring.tail - 1 + ring.capacity) % ring.capacity
+        let element = ring.storage[lastIndex]
+        ring.storage[lastIndex] = nil
+        ring.tail = lastIndex
+        ring._count -= 1
+        return element
+    }
+}
+
+// MARK: - Peek Accessor
+
+extension Buffer.Ring {
+    /// Nested accessor for peek operations.
+    ///
+    /// ```swift
+    /// let ring: Buffer.Ring<Int> = ...
+    /// if let front = ring.peek.front { ... }
+    /// if let back = ring.peek.back { ... }
+    /// ```
+    @inlinable
+    public var peek: Peek {
+        Peek(ring: self)
+    }
+}
+
+// MARK: - Peek Type
+
+extension Buffer.Ring {
+    /// Namespace for peek operations.
+    public struct Peek {
+        @usableFromInline
+        let ring: Buffer.Ring<Element>
+
+        @usableFromInline
+        init(ring: Buffer.Ring<Element>) {
+            self.ring = ring
+        }
+    }
+}
+
+// MARK: - Peek Operations
+
+extension Buffer.Ring.Peek {
+    /// The element at the front (oldest), or `nil` if empty.
+    @inlinable
+    public var front: Element? {
+        guard ring._count > 0 else { return nil }
+        return ring.storage[ring.head]
+    }
+
+    /// The element at the back (newest), or `nil` if empty.
+    @inlinable
+    public var back: Element? {
+        guard ring._count > 0 else { return nil }
+        let lastIndex = (ring.tail - 1 + ring.capacity) % ring.capacity
+        return ring.storage[lastIndex]
     }
 }
 
@@ -130,7 +282,7 @@ extension Buffer.Ring {
     public mutating func drain() -> [Element] {
         var result: [Element] = []
         result.reserveCapacity(_count)
-        while let element = dequeue() {
+        while let element = pop() {
             result.append(element)
         }
         return result
