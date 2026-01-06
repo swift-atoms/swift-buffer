@@ -88,7 +88,7 @@ extension Buffer {
     /// func process<B: Binary.Contiguous>(_ data: borrowing B) { ... }
     ///
     /// // Use Buffer.Aligned when alignment is the semantic requirement
-    /// var buffer = try Buffer.Aligned(byteCount: 4096, alignment: 4096)
+    /// var buffer = try Buffer.Aligned(byteCount: 4096, alignment: .page4096)
     /// buffer.copy(from: sourceData, at: 0)
     /// ```
     public struct Aligned: ~Copyable, @unchecked Sendable {
@@ -101,7 +101,7 @@ extension Buffer {
         public let count: Int
 
         /// The alignment of the allocation.
-        public let alignment: Int
+        public let alignment: Binary.Alignment
 
         deinit {
             // Don't free the shared page-aligned sentinel (used for empty buffers with alignment <= pageSize)
@@ -125,40 +125,35 @@ extension Buffer.Aligned {
     ///
     /// - Parameters:
     ///   - byteCount: The number of bytes to allocate. Must be non-negative.
-    ///   - alignment: The alignment boundary. Must be a power of 2 and at least
-    ///     `MemoryLayout<UnsafeRawPointer>.alignment` (typically 8 on 64-bit).
+    ///   - alignment: The alignment boundary. `Binary.Alignment` guarantees
+    ///     this is a valid power of 2.
     /// - Throws: `Error.invalidSize` if size is negative.
-    /// - Throws: `Error.invalidAlignment` if alignment is not a valid power of 2
-    ///   or is less than the platform minimum.
     /// - Throws: `Error.allocationFailed` if allocation fails.
     ///
     /// - Note: Empty buffers (`byteCount == 0`) are supported. They use a global
     ///   sentinel pointer and do not perform per-instance allocation.
-    public init(byteCount: Int, alignment: Int) throws(Error) {
+    public init(byteCount: Int, alignment: Binary.Alignment) throws(Error) {
         guard byteCount >= 0 else {
             throw .invalidSize
         }
 
-        let minimumAlignment = MemoryLayout<UnsafeRawPointer>.alignment
-        guard alignment >= minimumAlignment && alignment.nonzeroBitCount == 1 else {
-            throw .invalidAlignment
-        }
+        let alignmentMagnitude: Int = alignment.magnitude()
 
         // Empty buffer handling
         if byteCount == 0 {
             // For alignment <= pageSize, use the shared page-aligned sentinel
             // For alignment > pageSize, allocate a 1-byte buffer with requested alignment
-            if alignment <= Buffer.Memory.pageSize {
+            if alignmentMagnitude <= Buffer.Memory.pageSize {
                 self.bytePointer = emptyBufferSentinel
             } else {
                 #if os(Windows)
-                    guard let raw = _aligned_malloc(1, alignment) else {
+                    guard let raw = _aligned_malloc(1, alignmentMagnitude) else {
                         throw .allocationFailed
                     }
                     self.bytePointer = raw.bindMemory(to: UInt8.self, capacity: 1)
                 #else
                     var raw: UnsafeMutableRawPointer?
-                    let result = posix_memalign(&raw, alignment, 1)
+                    let result = posix_memalign(&raw, alignmentMagnitude, 1)
                     guard result == 0, let allocated = raw else {
                         throw .allocationFailed
                     }
@@ -171,13 +166,13 @@ extension Buffer.Aligned {
         }
 
         #if os(Windows)
-            guard let raw = _aligned_malloc(byteCount, alignment) else {
+            guard let raw = _aligned_malloc(byteCount, alignmentMagnitude) else {
                 throw .allocationFailed
             }
             self.bytePointer = raw.bindMemory(to: UInt8.self, capacity: byteCount)
         #else
             var raw: UnsafeMutableRawPointer?
-            let result = posix_memalign(&raw, alignment, byteCount)
+            let result = posix_memalign(&raw, alignmentMagnitude, byteCount)
             guard result == 0, let allocated = raw else {
                 throw .allocationFailed
             }
@@ -192,11 +187,11 @@ extension Buffer.Aligned {
     ///
     /// - Parameters:
     ///   - byteCount: The number of bytes to allocate.
-    ///   - alignment: The alignment boundary. Must be a power of 2.
+    ///   - alignment: The alignment boundary.
     /// - Throws: `Error.allocationFailed` if allocation fails.
     public static func zeroed(
         byteCount: Int,
-        alignment: Int
+        alignment: Binary.Alignment
     ) throws(Error) -> Self {
         let buffer = try Self(byteCount: byteCount, alignment: alignment)
         buffer.bytePointer.initialize(repeating: 0, count: byteCount)
@@ -211,7 +206,7 @@ extension Buffer.Aligned {
     /// - Parameter byteCount: The number of bytes to allocate.
     /// - Throws: `Error` if allocation fails.
     public static func pageAligned(byteCount: Int) throws(Error) -> Self {
-        try Self(byteCount: byteCount, alignment: Buffer.Memory.pageSize)
+        try Self(byteCount: byteCount, alignment: Buffer.Memory.pageAlignment)
     }
 }
 
@@ -252,14 +247,11 @@ extension Buffer.Aligned {
     /// It may also be aligned to larger powers of 2 depending on
     /// the underlying allocator.
     ///
-    /// - Parameter boundary: The alignment to check. Must be a power of 2.
-    /// - Returns: `true` if aligned, `false` otherwise or if boundary is invalid.
+    /// - Parameter boundary: The alignment to check.
+    /// - Returns: `true` if the buffer's base address is aligned to the boundary.
     @inlinable
-    public func isAligned(to boundary: Int) -> Bool {
-        guard boundary > 0 && boundary.nonzeroBitCount == 1 else {
-            return false
-        }
-        return Int(bitPattern: bytePointer) % boundary == 0
+    public func isAligned(to boundary: Binary.Alignment) -> Bool {
+        boundary.isAligned(UnsafeRawPointer(bytePointer))
     }
 }
 

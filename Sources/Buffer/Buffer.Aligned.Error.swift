@@ -4,9 +4,6 @@ extension Buffer.Aligned {
         /// The requested size is invalid (negative).
         case invalidSize
 
-        /// The requested alignment is invalid (not a power of 2).
-        case invalidAlignment
-
         /// Memory allocation failed.
         case allocationFailed
     }

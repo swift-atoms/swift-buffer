@@ -26,7 +26,7 @@ extension Buffer {
     /// ## Example
     ///
     /// ```swift
-    /// var buffer = try Buffer.Growable(minimumCapacity: 64, alignment: 8)
+    /// var buffer = try Buffer.Growable(minimumCapacity: 64, alignment: .doubleWord)
     /// var cursor = try Binary.Cursor(storage: buffer)
     ///
     /// // Write some data
@@ -51,19 +51,19 @@ extension Buffer {
         public let growthPolicy: Growth.Policy
 
         /// The alignment requirement (preserved across reallocations).
-        public let alignment: Int
+        public let alignment: Binary.Alignment
 
         /// Creates a growable buffer with the specified minimum capacity.
         ///
         /// - Parameters:
         ///   - minimumCapacity: The minimum initial capacity in bytes.
-        ///   - alignment: Memory alignment requirement (must be power of 2).
+        ///   - alignment: Memory alignment requirement.
         ///   - growthPolicy: Strategy for computing new capacity (default: doubling).
         /// - Throws: `Buffer.Aligned.Error` if allocation fails.
         @inlinable
         public init(
             minimumCapacity: Int,
-            alignment: Int,
+            alignment: Binary.Alignment,
             growthPolicy: Growth.Policy = .doubling
         ) throws(Aligned.Error) {
             self._storage = try Aligned(byteCount: minimumCapacity, alignment: alignment)
@@ -75,13 +75,13 @@ extension Buffer {
         ///
         /// - Parameters:
         ///   - minimumCapacity: The minimum initial capacity in bytes.
-        ///   - alignment: Memory alignment requirement (must be power of 2).
+        ///   - alignment: Memory alignment requirement.
         ///   - growthPolicy: Strategy for computing new capacity (default: doubling).
         /// - Throws: `Buffer.Aligned.Error` if allocation fails.
         @inlinable
         public static func zeroed(
             minimumCapacity: Int,
-            alignment: Int,
+            alignment: Binary.Alignment,
             growthPolicy: Growth.Policy = .doubling
         ) throws(Aligned.Error) -> Self {
             var result = try Self(

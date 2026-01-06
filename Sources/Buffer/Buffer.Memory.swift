@@ -1,3 +1,5 @@
+public import Binary
+
 #if canImport(Darwin)
     import Darwin
 #elseif canImport(Glibc)
@@ -29,6 +31,17 @@ extension Buffer.Memory {
         #endif
     }
 
+    /// Returns the system page size as a `Binary.Alignment`.
+    ///
+    /// Use this when creating page-aligned buffers or performing
+    /// alignment operations.
+    ///
+    /// - Note: System page sizes are always powers of 2.
+    public static var pageAlignment: Binary.Alignment {
+        // Safe: system page size is always a power of 2
+        try! Binary.Alignment(pageSize)
+    }
+
     /// Returns the allocation granularity.
     ///
     /// - POSIX: Same as page size
@@ -43,5 +56,15 @@ extension Buffer.Memory {
         #else
             return pageSize
         #endif
+    }
+
+    /// Returns the allocation granularity as a `Binary.Alignment`.
+    ///
+    /// Use this when aligning memory mapping offsets.
+    ///
+    /// - Note: Allocation granularity is always a power of 2.
+    public static var granularityAlignment: Binary.Alignment {
+        // Safe: allocation granularity is always a power of 2
+        try! Binary.Alignment(granularity)
     }
 }

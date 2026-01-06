@@ -1,3 +1,5 @@
+import Binary
+
 // MARK: - Test Helpers (Package Visibility)
 
 extension Buffer.Aligned {
@@ -17,7 +19,8 @@ extension Buffer.Aligned {
         offset: Int,
         _ body: (UnsafeRawBufferPointer) throws(Never) -> T
     ) -> T {
-        precondition(offset > 0 && offset < alignment, "Offset must break alignment")
+        let alignmentMagnitude: Int = alignment.magnitude()
+        precondition(offset > 0 && offset < alignmentMagnitude, "Offset must break alignment")
         precondition(offset < count, "Offset exceeds buffer size")
 
         return withUnsafeBytes { buffer in
@@ -38,7 +41,8 @@ extension Buffer.Aligned {
         offset: Int,
         _ body: (UnsafeRawBufferPointer) throws(E) -> T
     ) throws(E) -> T {
-        precondition(offset > 0 && offset < alignment, "Offset must break alignment")
+        let alignmentMagnitude: Int = alignment.magnitude()
+        precondition(offset > 0 && offset < alignmentMagnitude, "Offset must break alignment")
         precondition(offset < count, "Offset exceeds buffer size")
 
         return try withUnsafeBytes { (buffer: UnsafeRawBufferPointer) throws(E) -> T in
@@ -58,7 +62,8 @@ extension Buffer.Aligned {
         offset: Int,
         _ body: (UnsafeMutableRawBufferPointer) throws(Never) -> T
     ) -> T {
-        precondition(offset > 0 && offset < alignment, "Offset must break alignment")
+        let alignmentMagnitude: Int = alignment.magnitude()
+        precondition(offset > 0 && offset < alignmentMagnitude, "Offset must break alignment")
         precondition(offset < count, "Offset exceeds buffer size")
 
         return withUnsafeMutableBytes { [remaining = count - offset] buffer in
@@ -78,7 +83,8 @@ extension Buffer.Aligned {
         offset: Int,
         _ body: (UnsafeMutableRawBufferPointer) throws(E) -> T
     ) throws(E) -> T {
-        precondition(offset > 0 && offset < alignment, "Offset must break alignment")
+        let alignmentMagnitude: Int = alignment.magnitude()
+        precondition(offset > 0 && offset < alignmentMagnitude, "Offset must break alignment")
         precondition(offset < count, "Offset exceeds buffer size")
 
         return try withUnsafeMutableBytes { [remaining = count - offset] (buffer: UnsafeMutableRawBufferPointer) throws(E) -> T in

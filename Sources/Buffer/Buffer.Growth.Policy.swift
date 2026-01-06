@@ -1,6 +1,8 @@
 // Buffer.Growth.swift
 // Namespace for growth-related types.
 
+public import Binary
+
 extension Buffer {
     /// Namespace for buffer growth configuration.
     public enum Growth {}
@@ -113,17 +115,16 @@ extension Buffer.Growth.Policy {
 
     /// Page-aligned growth policy.
     ///
-    /// Rounds up to the next page boundary (typically 4KB or 16KB).
+    /// Rounds up to the next alignment boundary.
     /// Good for large buffers where page alignment matters.
     ///
-    /// - Parameter pageSize: The page size to align to (default: 4096).
-    /// - Returns: A growth policy that rounds to page boundaries.
+    /// - Parameter alignment: The alignment to round up to (default: `.page4096`).
+    /// - Returns: A growth policy that rounds to alignment boundaries.
     @inlinable
-    public static func pageAligned(_ pageSize: Int = 4096) -> Self {
-        precondition(pageSize > 0 && pageSize.nonzeroBitCount == 1, "Page size must be a power of 2")
+    public static func pageAligned(_ alignment: Binary.Alignment = .page4096) -> Self {
         return Self { _, required in
-            // Round up to next page boundary
-            let mask = pageSize - 1
+            // Round up to next alignment boundary
+            let mask: Int = alignment.mask()
             return (required + mask) & ~mask
         }
     }
