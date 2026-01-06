@@ -14,7 +14,7 @@ let package = Package(
         .library(name: "Buffer", targets: ["Buffer"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-standards.git", from: "0.24.1"),
+        .package(path: "../../swift-standards/swift-standards"),
     ],
     targets: [
         .target(
