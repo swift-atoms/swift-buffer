@@ -168,6 +168,12 @@ extension Buffer.Fixed {
         ensureUnique()
         storage.pointer!.advanced(by: storage.count).initialize(to: element)
         storage.count += 1
+
+        // Memory invariant: elements in [0..<count) initialized, [count..<capacity) uninitialized.
+        // After push, newly incremented count marks the boundary correctly.
+        #if DEBUG
+        assert(storage.count >= 1 && storage.count <= capacity, "Count invariant violated after push")
+        #endif
     }
 
     /// Pushes an element to the buffer, trapping if full.
@@ -185,6 +191,11 @@ extension Buffer.Fixed {
         ensureUnique()
         storage.pointer!.advanced(by: storage.count).initialize(to: element)
         storage.count += 1
+
+        // Memory invariant: elements in [0..<count) initialized, [count..<capacity) uninitialized.
+        #if DEBUG
+        assert(storage.count >= 1 && storage.count <= capacity, "Count invariant violated after push")
+        #endif
     }
 }
 
@@ -203,6 +214,13 @@ extension Buffer.Fixed {
         }
         ensureUnique()
         storage.count -= 1
+
+        // Memory invariant: after decrementing count, position [count] will be deinitialized via .move().
+        // Elements in [0..<count) remain initialized, [count..<capacity) become uninitialized.
+        #if DEBUG
+        assert(storage.count >= 0 && storage.count < capacity, "Count invariant violated after pop")
+        #endif
+
         return storage.pointer!.advanced(by: storage.count).move()
     }
 }
