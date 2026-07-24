@@ -1,5 +1,5 @@
 import Binary
-import StandardsTestSupport
+import Test_Primitives
 import Testing
 
 @testable import Buffer
