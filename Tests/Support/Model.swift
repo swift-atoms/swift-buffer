@@ -43,25 +43,27 @@ extension Model {
         var state: UInt64
 
         public init(seed: UInt64) { self.state = seed }
+    }
+}
 
-        public mutating func next() -> UInt64 {
-            state &+= 0x9E37_79B9_7F4A_7C15
-            var mixed = state
-            mixed = (mixed ^ (mixed >> 30)) &* 0xBF58_476D_1CE4_E5B9
-            mixed = (mixed ^ (mixed >> 27)) &* 0x94D0_49BB_1331_11EB
-            return mixed ^ (mixed >> 31)
-        }
+extension Model.Random {
+    public mutating func next() -> UInt64 {
+        state &+= 0x9E37_79B9_7F4A_7C15
+        var mixed = state
+        mixed = (mixed ^ (mixed >> 30)) &* 0xBF58_476D_1CE4_E5B9
+        mixed = (mixed ^ (mixed >> 27)) &* 0x94D0_49BB_1331_11EB
+        return mixed ^ (mixed >> 31)
+    }
 
-        /// Uniform draw in `0..<bound` (modulo draw; generator-grade bias is
-        /// irrelevant for op-stream generation).
-        public mutating func below(_ bound: Int) -> Int {
-            Int(next() % UInt64(bound))
-        }
+    /// Uniform draw in `0..<bound` (modulo draw; generator-grade bias is
+    /// irrelevant for op-stream generation).
+    public mutating func below(_ bound: Int) -> Int {
+        Int(next() % UInt64(bound))
+    }
 
-        /// True with probability `percent`/100.
-        public mutating func chance(_ percent: Int) -> Bool {
-            below(100) < percent
-        }
+    /// True with probability `percent`/100.
+    public mutating func chance(_ percent: Int) -> Bool {
+        below(100) < percent
     }
 }
 
@@ -74,32 +76,34 @@ extension Model {
         public var findings: [String] = []
 
         public init(seed: UInt64) { self.seed = seed }
+    }
+}
 
-        public var isClean: Bool { findings.isEmpty }
+extension Model.Verdict {
+    public var isClean: Bool { findings.isEmpty }
 
-        public mutating func record(_ operation: String) {
-            transcript.append(operation)
+    public mutating func record(_ operation: String) {
+        transcript.append(operation)
+    }
+
+    public mutating func diverged(_ messages: [String]) {
+        guard !messages.isEmpty else { return }
+        let at = transcript.endIndex - 1
+        let operation = at >= 0 ? transcript[at] : "(setup)"
+        findings.append(contentsOf: messages.map { "after op #\(at) `\(operation)`: \($0)" })
+    }
+
+    public var report: String {
+        if isClean {
+            return "clean — seed 0x\(String(seed, radix: 16)), \(transcript.count) ops"
         }
-
-        public mutating func diverged(_ messages: [String]) {
-            guard !messages.isEmpty else { return }
-            let at = transcript.endIndex - 1
-            let operation = at >= 0 ? transcript[at] : "(setup)"
-            findings.append(contentsOf: messages.map { "after op #\(at) `\(operation)`: \($0)" })
-        }
-
-        public var report: String {
-            if isClean {
-                return "clean — seed 0x\(String(seed, radix: 16)), \(transcript.count) ops"
-            }
-            return """
-            MODEL DIVERGENCE — seed 0x\(String(seed, radix: 16)), \(transcript.count) ops run
-            findings:
-            \(findings.map { "  - \($0)" }.joined(separator: "\n"))
-            transcript (replay by passing this seed):
-            \(transcript.enumerated().map { "  \($0.offset): \($0.element)" }.joined(separator: "\n"))
-            """
-        }
+        return """
+        MODEL DIVERGENCE — seed 0x\(String(seed, radix: 16)), \(transcript.count) ops run
+        findings:
+        \(findings.map { "  - \($0)" }.joined(separator: "\n"))
+        transcript (replay by passing this seed):
+        \(transcript.enumerated().map { "  \($0.offset): \($0.element)" }.joined(separator: "\n"))
+        """
     }
 }
 

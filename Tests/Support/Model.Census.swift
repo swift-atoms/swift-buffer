@@ -21,21 +21,23 @@ extension Model {
         public private(set) var died: [Int] = []
 
         public init() {}
+    }
+}
 
-        /// Registers a birth; returns the fixture's serial.
-        public func mint() -> Int {
-            let serial = born.count
-            born.append(serial)
-            return serial
-        }
+extension Model.Census {
+    /// Registers a birth; returns the fixture's serial.
+    public func mint() -> Int {
+        let serial = born.count
+        born.append(serial)
+        return serial
+    }
 
-        public func record(death serial: Int) {
-            died.append(serial)
-        }
+    public func record(death serial: Int) {
+        died.append(serial)
+    }
 
-        /// Every mint died exactly once (multiset equality over serials).
-        public var isExact: Bool {
-            born.sorted() == died.sorted()
-        }
+    /// Every mint died exactly once (multiset equality over serials).
+    public var isExact: Bool {
+        born.sorted() == died.sorted()
     }
 }
