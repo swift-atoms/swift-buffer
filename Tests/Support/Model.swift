@@ -10,15 +10,15 @@
 // ===----------------------------------------------------------------------===//
 
 #if canImport(Darwin)
-import Darwin
+    import Darwin
 #elseif os(Android)
-import Android
+    import Android
 #elseif canImport(Glibc)
-import Glibc
+    import Glibc
 #elseif canImport(Musl)
-import Musl
+    import Musl
 #elseif canImport(ucrt)
-import ucrt
+    import ucrt
 #endif
 
 // The model-test harness core (arc-2; home seat-ruled 2026-06-11, ASK-W1-A:
@@ -98,12 +98,12 @@ extension Model.Verdict {
             return "clean — seed 0x\(String(seed, radix: 16)), \(transcript.count) ops"
         }
         return """
-        MODEL DIVERGENCE — seed 0x\(String(seed, radix: 16)), \(transcript.count) ops run
-        findings:
-        \(findings.map { "  - \($0)" }.joined(separator: "\n"))
-        transcript (replay by passing this seed):
-        \(transcript.enumerated().map { "  \($0.offset): \($0.element)" }.joined(separator: "\n"))
-        """
+            MODEL DIVERGENCE — seed 0x\(String(seed, radix: 16)), \(transcript.count) ops run
+            findings:
+            \(findings.map { "  - \($0)" }.joined(separator: "\n"))
+            transcript (replay by passing this seed):
+            \(transcript.enumerated().map { "  \($0.offset): \($0.element)" }.joined(separator: "\n"))
+            """
     }
 }
 
@@ -149,10 +149,10 @@ extension Model {
         // Embedded targets have no process environment; fall back to the
         // CI-scale defaults ([PKG-BUILD-007] source-guard pattern).
         #if hasFeature(Embedded)
-        return nil
+            return nil
         #else
-        guard let pointer = unsafe getenv(name) else { return nil }
-        return unsafe String(validatingCString: pointer)
+            guard let pointer = unsafe getenv(name) else { return nil }
+            return unsafe String(validatingCString: pointer)
         #endif
     }
 }
