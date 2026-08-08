@@ -27,9 +27,10 @@ extension Buffer.Slice where Element: ~Copyable {
         _span
     }
 
-    /// A bounds-checked sub-slice. A `func`, never a subscript — the
-    /// producer-is-a-func discipline the spike established for
-    /// `~Escapable`-returning bound operations.
+    /// A bounds-checked sub-slice.
+    ///
+    /// A `func`, never a subscript — the producer-is-a-func discipline the
+    /// spike established for `~Escapable`-returning bound operations.
     @_lifetime(copy self)
     @inlinable
     public borrowing func extracting(_ bounds: Range<Int>) -> Buffer.Slice<Element> {

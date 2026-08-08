@@ -27,8 +27,9 @@ import Testing
 
 // MARK: - Reference model columns
 
-/// A minimal lawful column over the seam (`Store.Protocol` x `Buffer.Protocol`):
-/// slot-addressed, count-honest, fixed capacity. Purely a model — no real storage.
+/// A minimal lawful column over the seam (`Store.Protocol` x `Buffer.Protocol`).
+///
+/// Slot-addressed, count-honest, fixed capacity. Purely a model — no real storage.
 private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
     typealias Element = Int
 
@@ -41,8 +42,18 @@ private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
     var count: Index<Int>.Count { Index<Int>.Count(UInt(slots.count)) }
 
     subscript(slot: Index<Int>) -> Int {
-        get { slots.first(where: { $0.slot == slot })!.element }
-        set { slots[slots.firstIndex(where: { $0.slot == slot })!].element = newValue }
+        get {
+            guard let found = slots.first(where: { $0.slot == slot }) else {
+                preconditionFailure("LawfulColumn: read of uninitialized slot \(slot)")
+            }
+            return found.element
+        }
+        set {
+            guard let index = slots.firstIndex(where: { $0.slot == slot }) else {
+                preconditionFailure("LawfulColumn: write to uninitialized slot \(slot)")
+            }
+            slots[index].element = newValue
+        }
     }
 
     mutating func initialize(at slot: Index<Int>, to element: consuming Int) {
@@ -50,7 +61,10 @@ private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
     }
 
     mutating func move(at slot: Index<Int>) -> Int {
-        slots.remove(at: slots.firstIndex(where: { $0.slot == slot })!).element
+        guard let index = slots.firstIndex(where: { $0.slot == slot }) else {
+            preconditionFailure("LawfulColumn: move of uninitialized slot \(slot)")
+        }
+        return slots.remove(at: index).element
     }
 }
 
@@ -63,8 +77,14 @@ private struct CountLaggingColumn: Store.`Protocol`, Buffer.`Protocol` {
 
     var capacity: Index<Int>.Count { lawful.capacity }
     var count: Index<Int>.Count {
+        // Deliberately unlawful fixture — this column exists ONLY to prove the
+        // seam ledger CATCHES an off-by-one count drift; the `- 1` below is the
+        // bug under test, not an evasion of typed Cardinal arithmetic (there is
+        // no typed `Index<Int>.Count` subtraction to reach for here since
+        // `lawful.slots.count` is stdlib `Array.count: Int`).
         lawful.slots.isEmpty
             ? Index<Int>.Count(UInt(0))
+            // swiftlint:disable:next cardinal_count_minus_one_anti_pattern
             : Index<Int>.Count(UInt(lawful.slots.count - 1))
     }
 

@@ -10,6 +10,7 @@
 // ===----------------------------------------------------------------------===//
 
 extension Buffer.Capacity: Comparable {
+    /// Orders capacities by their underlying bound.
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.count < rhs.count

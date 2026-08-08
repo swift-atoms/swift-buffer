@@ -32,7 +32,12 @@ extension FixedColumn: Store.`Protocol` {
     var capacity: Index<Int>.Count { fixedCapacity }
 
     subscript(slot: Index<Int>) -> Int {
-        get { slots[slot]! }
+        get {
+            guard let element = slots[slot] else {
+                preconditionFailure("FixedColumn: read of uninitialized slot \(slot)")
+            }
+            return element
+        }
         set { slots[slot] = newValue }
     }
 
@@ -41,7 +46,10 @@ extension FixedColumn: Store.`Protocol` {
     }
 
     mutating func move(at slot: Index<Int>) -> Int {
-        slots.removeValue(forKey: slot)!
+        guard let element = slots.removeValue(forKey: slot) else {
+            preconditionFailure("FixedColumn: move of uninitialized slot \(slot)")
+        }
+        return element
     }
 }
 
