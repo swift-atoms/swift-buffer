@@ -53,6 +53,9 @@ let package = Package(
             dependencies: [
                 "Buffer Primitive",
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
+                // TX-N1B: Buffer.Storage composes (HAS-A, never IS-A) a
+                // Store.`Protocol` substrate — buffer-storage-associatedtype-prior-art.md.
+                .product(name: "Store Protocol Primitives", package: "swift-storage-primitives"),
             ]
         ),
 
@@ -83,6 +86,8 @@ let package = Package(
             dependencies: [
                 .target(name: "Buffer Primitives"),
                 .target(name: "Buffer Primitives Test Support"),
+                .product(name: "Index Primitives", package: "swift-index-primitives"),
+                .product(name: "Store Protocol Primitives", package: "swift-storage-primitives"),
             ]
         ),
     ],
