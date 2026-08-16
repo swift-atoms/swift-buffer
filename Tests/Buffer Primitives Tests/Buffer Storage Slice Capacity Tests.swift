@@ -132,7 +132,9 @@ extension `Buffer Storage Slice Capacity Tests` {
         // construction, not aliased to any later mutation of the source value
 
         @Test
-        func `Buffer Storage capacity is an independent copy, not a live reference to the source value`() {
+        func
+            `Buffer Storage capacity is an independent copy, not a live reference to the source value`()
+        {
             // GrowingColumn's capacity is a `var`, unlike FixedColumn's `let` —
             // required so a divergence is even OBSERVABLE (a `let`-backed
             // fixture cannot distinguish "captured once" from "re-derived on
@@ -192,7 +194,9 @@ extension `Buffer Storage Slice Capacity Tests` {
         }
 
         @Test
-        func `Buffer Storage at boundary-capacity zero reports zero capacity, not the store's own drift`() {
+        func
+            `Buffer Storage at boundary-capacity zero reports zero capacity, not the store's own drift`()
+        {
             let column = FixedColumn(capacity: .zero)
             let storage = Buffer<Never>.Storage(base: column)
             #expect(storage.capacity == .zero)

@@ -84,7 +84,6 @@ private struct CountLaggingColumn: Store.`Protocol`, Buffer.`Protocol` {
         // `lawful.slots.count` is stdlib `Array.count: Int`).
         lawful.slots.isEmpty
             ? Index<Int>.Count(UInt(0))
-            // swiftlint:disable:next cardinal_count_minus_one_anti_pattern
             : Index<Int>.Count(UInt(lawful.slots.count - 1))
     }
 
