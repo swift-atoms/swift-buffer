@@ -1,15 +1,15 @@
-// swift-tools-version: 6.3.3
+// swift-tools-version: 6.4
 
 import PackageDescription
 
 let package = Package(
     name: "swift-buffer-primitives",
     platforms: [
-        .macOS("27"),
-        .iOS("27"),
-        .tvOS("27"),
-        .watchOS("27"),
-        .visionOS("27"),
+        .macOS(.v27),
+        .iOS(.v27),
+        .tvOS(.v27),
+        .watchOS(.v27),
+        .visionOS(.v27),
     ],
     products: [
         // MARK: - Substrate (per [MOD-031]) — the buffer-discipline substrate.
@@ -24,18 +24,30 @@ let package = Package(
         .library(name: "Buffer Primitives", targets: ["Buffer Primitives"]),
 
         // MARK: - Test Support
-        .library(name: "Buffer Primitives Test Support", targets: ["Buffer Primitives Test Support"]),
+        .library(
+            name: "Buffer Primitives Test Support",
+            targets: ["Buffer Primitives Test Support"]
+        ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-primitives/swift-index-primitives.git",
+            branch: "main"
+        ),
         // W4 audit #2: the seam-ledger LAWS (test support) span Store.Protocol × Buffer.Protocol.
-        .package(url: "https://github.com/swift-primitives/swift-storage-primitives.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-primitives/swift-storage-primitives.git",
+            branch: "main"
+        ),
         // W2 mesh: resolve memory against the W2 worktree so every path to memory in
         // the buffer cohort unifies on identity `swift-memory-primitives` (no
         // url-form memory in the graph → no "multiple similar targets" collision).
         // Buffer.Protocol is count-based and vends NO span conformance, so no source
         // reconform is needed here — this is the dependency-mesh repoint only.
-        .package(url: "https://github.com/swift-primitives/swift-memory-primitives.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-primitives/swift-memory-primitives.git",
+            branch: "main"
+        ),
     ],
     targets: [
 
@@ -75,7 +87,10 @@ let package = Package(
                 "Buffer Primitives",
                 .product(name: "Store Protocol Primitives", package: "swift-storage-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Memory Primitives Test Support", package: "swift-memory-primitives"),
+                .product(
+                    name: "Memory Primitives Test Support",
+                    package: "swift-memory-primitives"
+                ),
             ],
             path: "Tests/Support"
         ),
