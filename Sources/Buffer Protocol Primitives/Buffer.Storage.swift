@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Index_Primitives
+import Index_Primitives
 public import Store_Protocol_Primitives
 
 // MARK: - Buffer.Storage (TX-N1B)
