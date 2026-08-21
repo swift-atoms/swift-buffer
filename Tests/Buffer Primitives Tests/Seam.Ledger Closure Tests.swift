@@ -1,35 +1,9 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Buffer_Primitives
 import Buffer_Primitives_Test_Support
 import Index_Primitives
 import Store_Protocol_Primitives
 import Testing
 
-// MARK: - Self-firing closure fixtures for the seam-ledger laws (TX-N1B)
-//
-// The bound owner of the buffer discipline vends the seam-ledger law fixture
-// (`Seam.Ledger.violations`) that every downstream column suite relies on. These
-// closure fixtures prove, from the owner's OWN suite, that the fixture itself
-// fires: a lawful reference column produces zero violations (positive control)
-// and deliberately unlawful columns are each caught (negative controls). Without
-// this, a silently broken ledger would let every downstream law suite pass
-// vacuously.
-
-// MARK: - Reference model columns
-
-/// A minimal lawful column over the seam (`Store.Protocol` x `Buffer.Protocol`).
-///
-/// Slot-addressed, count-honest, fixed capacity. Purely a model — no real storage.
 private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
     typealias Element = Int
 
@@ -68,8 +42,6 @@ private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
     }
 }
 
-/// An unlawful column whose `initialize(at:to:)` FAILS to increment `count`
-/// (it reports the ledger of a column one element behind).
 private struct CountLaggingColumn: Store.`Protocol`, Buffer.`Protocol` {
     typealias Element = Int
 
@@ -77,11 +49,7 @@ private struct CountLaggingColumn: Store.`Protocol`, Buffer.`Protocol` {
 
     var capacity: Index<Int>.Count { lawful.capacity }
     var count: Index<Int>.Count {
-        // Deliberately unlawful fixture — this column exists ONLY to prove the
-        // seam ledger CATCHES an off-by-one count drift; the `- 1` below is the
-        // bug under test, not an evasion of typed Cardinal arithmetic (there is
-        // no typed `Index<Int>.Count` subtraction to reach for here since
-        // `lawful.slots.count` is stdlib `Array.count: Int`).
+
         lawful.slots.isEmpty
             ? Index<Int>.Count(UInt(0))
             : Index<Int>.Count(UInt(lawful.slots.count - 1))
@@ -101,7 +69,6 @@ private struct CountLaggingColumn: Store.`Protocol`, Buffer.`Protocol` {
     }
 }
 
-/// An unlawful column whose seam element ops SHRINK the reported capacity.
 private struct CapacityDriftingColumn: Store.`Protocol`, Buffer.`Protocol` {
     typealias Element = Int
 
@@ -126,8 +93,6 @@ private struct CapacityDriftingColumn: Store.`Protocol`, Buffer.`Protocol` {
         return lawful.move(at: slot)
     }
 }
-
-// MARK: - The closure fixtures
 
 @Suite
 struct SeamLedgerClosureTests {

@@ -1,46 +1,15 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 public import Buffer_Protocol_Primitives
-// `Index_Primitives` is used only in the (non-inlinable) body after M7 dropped the
-// `where S.Count == Index<S.Element>.Count` signature clause — internal import suffices.
+
 import Index_Primitives
 public import Store_Protocol_Primitives
 
 extension Seam {
-    /// THE SEAM LEDGER LAWS — the contract `Array`-tier generic mutations rely on but the
-    /// type system cannot express: a COLUMN's seam operations keep `Buffer.Protocol.count`
-    /// honest (`initialize(at:to:)` increments by one; `move(at:)` decrements by one; the
-    /// element subscript leaves it unchanged; `capacity` is untouched by all three).
-    ///
-    /// Every type that conforms to BOTH seam protocols and is consumed as an ADT column
-    /// MUST pass these laws from its own test suite:
-    ///
-    /// ```swift
-    /// let violations = Seam.Ledger.violations(
-    ///     makeEmpty: { MyColumn(minimumCapacity: Index<Int>.Count(2)) },
-    ///     element: { $0 }
-    /// )
-    /// #expect(violations.isEmpty)
-    /// ```
+
     public enum Ledger {}
 }
 
 extension Seam.Ledger {
-    /// Runs the ledger laws against a fresh column and returns human-readable
-    /// descriptions of every violated law (empty = lawful).
-    ///
-    /// - Parameters:
-    ///   - makeEmpty: Constructs an EMPTY column with capacity ≥ 2.
-    ///   - element: Produces a distinguishable element for a given ordinal.
+
     public static func violations<S: Store.`Protocol` & Buffer.`Protocol` & ~Copyable>(
         makeEmpty: () -> S,
         element: (Int) -> S.Element
