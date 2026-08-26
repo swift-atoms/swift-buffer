@@ -1,6 +1,6 @@
-import Buffer_Primitives
-import Index_Primitives
-import Store_Protocol_Primitives
+import Buffer
+import Index
+import Store_Protocol
 import Testing
 
 private struct FixedColumn {

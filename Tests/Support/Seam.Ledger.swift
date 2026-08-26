@@ -1,7 +1,7 @@
-public import Buffer_Protocol_Primitives
+public import Buffer_Protocol
 
-import Index_Primitives
-public import Store_Protocol_Primitives
+import Index
+public import Store_Protocol
 
 extension Seam {
 

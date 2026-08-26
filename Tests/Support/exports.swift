@@ -1,2 +1,2 @@
-@_exported public import Buffer_Primitives
-@_exported public import Memory_Primitives_Test_Support
+@_exported public import Buffer
+@_exported public import Memory_Test_Support

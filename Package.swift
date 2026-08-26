@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-buffer-primitives",
+    name: "swift-buffer",
     platforms: [
         .macOS(.v27),
         .iOS(.v27),
@@ -15,28 +15,28 @@ let package = Package(
 
         .library(name: "Buffer Primitive", targets: ["Buffer Primitive"]),
 
-        .library(name: "Buffer Protocol Primitives", targets: ["Buffer Protocol Primitives"]),
+        .library(name: "Buffer Protocol", targets: ["Buffer Protocol"]),
 
-        .library(name: "Buffer Primitives", targets: ["Buffer Primitives"]),
+        .library(name: "Buffer", targets: ["Buffer"]),
 
         .library(
-            name: "Buffer Primitives Test Support",
-            targets: ["Buffer Primitives Test Support"]
+            name: "Buffer Test Support",
+            targets: ["Buffer Test Support"]
         ),
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-index-primitives.git",
+            url: "https://github.com/swift-molecules/swift-index.git",
             branch: "main"
         ),
 
         .package(
-            url: "https://github.com/swift-primitives/swift-storage-primitives.git",
+            url: "https://github.com/swift-molecules/swift-storage.git",
             branch: "main"
         ),
 
         .package(
-            url: "https://github.com/swift-primitives/swift-memory-primitives.git",
+            url: "https://github.com/swift-molecules/swift-memory.git",
             branch: "main"
         ),
     ],
@@ -48,44 +48,44 @@ let package = Package(
         ),
 
         .target(
-            name: "Buffer Protocol Primitives",
+            name: "Buffer Protocol",
             dependencies: [
                 "Buffer Primitive",
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
+                .product(name: "Index", package: "swift-index"),
 
-                .product(name: "Store Protocol Primitives", package: "swift-storage-primitives"),
+                .product(name: "Store Protocol", package: "swift-storage"),
             ]
         ),
 
         .target(
-            name: "Buffer Primitives",
+            name: "Buffer",
             dependencies: [
                 "Buffer Primitive",
-                "Buffer Protocol Primitives",
+                "Buffer Protocol",
             ]
         ),
 
         .target(
-            name: "Buffer Primitives Test Support",
+            name: "Buffer Test Support",
             dependencies: [
-                "Buffer Primitives",
-                .product(name: "Store Protocol Primitives", package: "swift-storage-primitives"),
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
+                "Buffer",
+                .product(name: "Store Protocol", package: "swift-storage"),
+                .product(name: "Index", package: "swift-index"),
                 .product(
-                    name: "Memory Primitives Test Support",
-                    package: "swift-memory-primitives"
+                    name: "Memory Test Support",
+                    package: "swift-memory"
                 ),
             ],
             path: "Tests/Support"
         ),
 
         .testTarget(
-            name: "Buffer Primitives Tests",
+            name: "Buffer Tests",
             dependencies: [
-                .target(name: "Buffer Primitives"),
-                .target(name: "Buffer Primitives Test Support"),
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Store Protocol Primitives", package: "swift-storage-primitives"),
+                .target(name: "Buffer"),
+                .target(name: "Buffer Test Support"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Store Protocol", package: "swift-storage"),
             ]
         ),
     ],

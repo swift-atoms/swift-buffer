@@ -1,7 +1,7 @@
-import Buffer_Primitives
-import Buffer_Primitives_Test_Support
-import Index_Primitives
-import Store_Protocol_Primitives
+import Buffer
+import Buffer_Test_Support
+import Index
+import Store_Protocol
 import Testing
 
 private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
