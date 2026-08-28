@@ -12,40 +12,81 @@ let package = Package(
         .visionOS(.v27),
     ],
     products: [
+
+        .library(name: "Buffer Primitive", targets: ["Buffer Primitive"]),
+
+        .library(name: "Buffer Protocol", targets: ["Buffer Protocol"]),
+
+        .library(name: "Buffer", targets: ["Buffer"]),
+
         .library(
-            name: "Buffer",
-            targets: ["Buffer"]
-        ),
-        .library(
-            name: "Buffer Standard Library Integration",
-            targets: ["Buffer Standard Library Integration"]
-        ),
-        .library(
-            name: "Buffer Apple Foundation Integration",
-            targets: ["Buffer Apple Foundation Integration"]
+            name: "Buffer Test Support",
+            targets: ["Buffer Test Support"]
         ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(
+            url: "https://github.com/swift-molecules/swift-index.git",
+            branch: "main"
+        ),
+
+        .package(
+            url: "https://github.com/swift-molecules/swift-storage.git",
+            branch: "main"
+        ),
+
+        .package(
+            url: "https://github.com/swift-molecules/swift-memory.git",
+            branch: "main"
+        ),
+    ],
     targets: [
+
         .target(
-            name: "Buffer",
+            name: "Buffer Primitive",
             dependencies: []
         ),
+
         .target(
-            name: "Buffer Standard Library Integration",
-            dependencies: ["Buffer"]
-        ),
-        .target(
-            name: "Buffer Apple Foundation Integration",
+            name: "Buffer Protocol",
             dependencies: [
-                "Buffer",
-                "Buffer Standard Library Integration",
+                "Buffer Primitive",
+                .product(name: "Index", package: "swift-index"),
+
+                .product(name: "Store Protocol", package: "swift-storage"),
             ]
         ),
+
+        .target(
+            name: "Buffer",
+            dependencies: [
+                "Buffer Primitive",
+                "Buffer Protocol",
+            ]
+        ),
+
+        .target(
+            name: "Buffer Test Support",
+            dependencies: [
+                "Buffer",
+                .product(name: "Store Protocol", package: "swift-storage"),
+                .product(name: "Index", package: "swift-index"),
+                .product(
+                    name: "Memory Test Support",
+                    package: "swift-memory"
+                ),
+            ],
+            path: "Tests/Support"
+        ),
+
         .testTarget(
             name: "Buffer Tests",
-            dependencies: ["Buffer"],
-            path: "Tests/Buffer Tests"
+            dependencies: [
+                .target(name: "Buffer"),
+                .target(name: "Buffer Test Support"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Store Protocol", package: "swift-storage"),
+            ]
         ),
     ],
     swiftLanguageModes: [.v6]
