@@ -1,2 +1,2 @@
-@_exported public import Buffer_Primitive
+@_exported public import Buffer
 @_exported public import Index

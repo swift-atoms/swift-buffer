@@ -1,7 +1,7 @@
-# Buffer
+# Buffer Primitives
 
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
-[![CI](https://github.com/swift-molecules/swift-buffer/actions/workflows/ci.yml/badge.svg)](https://github.com/swift-molecules/swift-buffer/actions/workflows/ci.yml)
+[![CI](https://github.com/swift-atoms/swift-buffer/actions/workflows/ci.yml/badge.svg)](https://github.com/swift-atoms/swift-buffer/actions/workflows/ci.yml)
 
 `Buffer<S>` — the buffer-discipline namespace, parameterized by the storage substrate `S` (any `Storage.Protocol` conformer). It is the shared root the buffer disciplines build on: **`Buffer.Linear`** (contiguous, front-to-back), **`Buffer.Ring`** (circular, wrap-around), **`Buffer.Slots`** (metadata-parametric random-access slots), and **`Buffer.Linked`** (generational linked list) — each shipped in its own package over this namespace.
 
@@ -41,7 +41,7 @@ Add the dependency to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-molecules/swift-buffer.git", branch: "main")
+    .package(url: "https://github.com/swift-atoms/swift-buffer.git", branch: "main")
 ]
 ```
 
@@ -64,9 +64,9 @@ The package is pre-1.0 — depend on `branch: "main"` until `0.1.0` is tagged. R
 
 | Product | Contents | When to import |
 |---------|----------|----------------|
-| `Buffer` | Umbrella — re-exports the namespace and the protocol | Most consumers |
+| `Buffer Primitives` | Umbrella — re-exports the namespace and the protocol | Most consumers |
 | `Buffer Primitive` | `Buffer<S>` — the discipline namespace over a storage substrate | Naming the namespace directly |
-| `Buffer Protocol` | `Buffer.Protocol` — the shared `count` / `isEmpty` capability | Writing code generic over disciplines |
+| `Buffer Protocol Primitives` | `Buffer.Protocol` — the shared `count` / `isEmpty` capability | Writing code generic over disciplines |
 
 ---
 
@@ -84,12 +84,12 @@ The package is pre-1.0 — depend on `branch: "main"` until `0.1.0` is tagged. R
 
 ## Related Packages
 
-- [`swift-buffer-linear`](https://github.com/swift-molecules/swift-buffer-linear) — `Buffer.Linear`, the contiguous discipline.
-- [`swift-buffer-ring`](https://github.com/swift-molecules/swift-buffer-ring) — `Buffer.Ring`, the circular discipline.
-- [`swift-buffer-linked`](https://github.com/swift-molecules/swift-buffer-linked) — `Buffer.Linked`, the linked discipline.
-- [`swift-buffer-slots`](https://github.com/swift-molecules/swift-buffer-slots) — `Buffer.Slots`, the random-access slots discipline.
-- [`swift-storage`](https://github.com/swift-molecules/swift-storage) — `Storage`, the substrate every discipline is parameterized over.
-- [`swift-index`](https://github.com/swift-molecules/swift-index) — `Index<Element>.Count`, the natural counting domain.
+- [`swift-buffer-linear`](https://github.com/swift-atoms/swift-buffer-linear) — `Buffer.Linear`, the contiguous discipline.
+- [`swift-buffer-ring`](https://github.com/swift-atoms/swift-buffer-ring) — `Buffer.Ring`, the circular discipline.
+- [`swift-buffer-linked`](https://github.com/swift-atoms/swift-buffer-linked) — `Buffer.Linked`, the linked discipline.
+- [`swift-buffer-slots`](https://github.com/swift-atoms/swift-buffer-slots) — `Buffer.Slots`, the random-access slots discipline.
+- [`swift-storage`](https://github.com/swift-atoms/swift-storage) — `Storage`, the substrate every discipline is parameterized over.
+- [`swift-index`](https://github.com/swift-atoms/swift-index) — `Index<Element>.Count`, the natural counting domain.
 
 ---
 

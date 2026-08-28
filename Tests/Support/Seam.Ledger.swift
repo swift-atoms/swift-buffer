@@ -10,7 +10,7 @@ extension Seam {
 
 extension Seam.Ledger {
 
-    public static func violations<S: Store.`Protocol` & Buffer.`Protocol` & ~Copyable>(
+    public static func violations<S: Store::Store.`Protocol` & Buffer.`Protocol` & ~Copyable>(
         makeEmpty: () -> S,
         element: (Int) -> S.Element
     ) -> [String] {

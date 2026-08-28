@@ -13,8 +13,6 @@ let package = Package(
     ],
     products: [
 
-        .library(name: "Buffer Primitive", targets: ["Buffer Primitive"]),
-
         .library(name: "Buffer Protocol", targets: ["Buffer Protocol"]),
 
         .library(name: "Buffer", targets: ["Buffer"]),
@@ -26,53 +24,45 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-molecules/swift-index.git",
+            url: "https://github.com/swift-atoms/swift-index.git",
             branch: "main"
         ),
 
         .package(
-            url: "https://github.com/swift-molecules/swift-storage.git",
+            url: "https://github.com/swift-atoms/swift-store.git",
             branch: "main"
         ),
 
         .package(
-            url: "https://github.com/swift-molecules/swift-memory.git",
+            url: "https://github.com/swift-atoms/swift-memory.git",
             branch: "main"
         ),
     ],
     targets: [
 
         .target(
-            name: "Buffer Primitive",
+            name: "Buffer",
             dependencies: []
         ),
 
         .target(
             name: "Buffer Protocol",
             dependencies: [
-                "Buffer Primitive",
+                .target(name: "Buffer"),
                 .product(name: "Index", package: "swift-index"),
 
-                .product(name: "Store Protocol", package: "swift-storage"),
-            ]
-        ),
-
-        .target(
-            name: "Buffer",
-            dependencies: [
-                "Buffer Primitive",
-                "Buffer Protocol",
+                .product(name: "Store Protocol", package: "swift-store"),
             ]
         ),
 
         .target(
             name: "Buffer Test Support",
             dependencies: [
-                "Buffer",
-                .product(name: "Store Protocol", package: "swift-storage"),
+                .target(name: "Buffer"),
+                .product(name: "Store Protocol", package: "swift-store"),
                 .product(name: "Index", package: "swift-index"),
                 .product(
-                    name: "Memory Test Support",
+                    name: "Memory",
                     package: "swift-memory"
                 ),
             ],
@@ -85,7 +75,7 @@ let package = Package(
                 .target(name: "Buffer"),
                 .target(name: "Buffer Test Support"),
                 .product(name: "Index", package: "swift-index"),
-                .product(name: "Store Protocol", package: "swift-storage"),
+                .product(name: "Store Protocol", package: "swift-store"),
             ]
         ),
     ],
