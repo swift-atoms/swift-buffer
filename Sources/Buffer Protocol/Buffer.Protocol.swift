@@ -1,5 +1,5 @@
-public import Buffer_Primitive
-public import Index_Primitives
+public import Buffer
+public import Index
 
 public protocol __BufferProtocol: ~Copyable, ~Escapable {
 

@@ -1,10 +1,10 @@
-import Buffer_Primitives
-import Buffer_Primitives_Test_Support
-import Index_Primitives
-import Store_Protocol_Primitives
+import Buffer
+import Buffer_Test_Support
+import Index
+import Store_Protocol
 import Testing
 
-private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
+private struct LawfulColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
     typealias Element = Int
 
     var slots: [(slot: Index<Int>, element: Int)] = []
@@ -42,7 +42,7 @@ private struct LawfulColumn: Store.`Protocol`, Buffer.`Protocol` {
     }
 }
 
-private struct CountLaggingColumn: Store.`Protocol`, Buffer.`Protocol` {
+private struct CountLaggingColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
     typealias Element = Int
 
     var lawful = LawfulColumn(capacity: Index<Int>.Count(UInt(4)))
@@ -69,7 +69,7 @@ private struct CountLaggingColumn: Store.`Protocol`, Buffer.`Protocol` {
     }
 }
 
-private struct CapacityDriftingColumn: Store.`Protocol`, Buffer.`Protocol` {
+private struct CapacityDriftingColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
     typealias Element = Int
 
     var lawful = LawfulColumn(capacity: Index<Int>.Count(UInt(4)))

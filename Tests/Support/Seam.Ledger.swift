@@ -1,7 +1,7 @@
-public import Buffer_Protocol_Primitives
+public import Buffer_Protocol
 
-import Index_Primitives
-public import Store_Protocol_Primitives
+import Index
+public import Store_Protocol
 
 extension Seam {
 
@@ -10,7 +10,7 @@ extension Seam {
 
 extension Seam.Ledger {
 
-    public static func violations<S: Store.`Protocol` & Buffer.`Protocol` & ~Copyable>(
+    public static func violations<S: Store::Store.`Protocol` & Buffer.`Protocol` & ~Copyable>(
         makeEmpty: () -> S,
         element: (Int) -> S.Element
     ) -> [String] {

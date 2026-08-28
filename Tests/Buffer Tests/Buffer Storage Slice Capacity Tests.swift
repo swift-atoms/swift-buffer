@@ -1,6 +1,6 @@
-import Buffer_Primitives
-import Index_Primitives
-import Store_Protocol_Primitives
+import Buffer
+import Index
+import Store_Protocol
 import Testing
 
 private struct FixedColumn {
@@ -17,7 +17,7 @@ private struct GrowingColumn {
     init(capacity: Index<Int>.Count) { self.reportedCapacity = capacity }
 }
 
-extension GrowingColumn: Store.`Protocol` {
+extension GrowingColumn: Store::Store.`Protocol` {
     typealias Element = Int
 
     var capacity: Index<Int>.Count { reportedCapacity }
@@ -44,7 +44,7 @@ extension GrowingColumn: Store.`Protocol` {
     }
 }
 
-extension FixedColumn: Store.`Protocol` {
+extension FixedColumn: Store::Store.`Protocol` {
     typealias Element = Int
 
     var capacity: Index<Int>.Count { fixedCapacity }
