@@ -1,6 +1,12 @@
 import Buffer
+import Buffer_Protocol
+import Cardinal_Tagged
 import Index
+import Ordinal
+import Ordinal_Protocol
+import Store
 import Store_Protocol
+import Tagged
 import Testing
 
 private struct FixedColumn {
