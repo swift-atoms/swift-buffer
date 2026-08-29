@@ -1,4 +1,5 @@
 import Index
+public import Store
 public import Store_Protocol
 
 extension Buffer where S: ~Copyable {

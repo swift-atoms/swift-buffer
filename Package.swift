@@ -24,7 +24,16 @@ let package = Package(
     ],
     dependencies: [
         .package(
+            url: "https://github.com/swift-atoms/swift-cardinal.git",
+            branch: "main"
+        ),
+        .package(
             url: "https://github.com/swift-atoms/swift-index.git",
+            branch: "main"
+        ),
+
+        .package(
+            url: "https://github.com/swift-atoms/swift-ordinal.git",
             branch: "main"
         ),
 
@@ -35,6 +44,10 @@ let package = Package(
 
         .package(
             url: "https://github.com/swift-atoms/swift-memory.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-atoms/swift-tagged.git",
             branch: "main"
         ),
     ],
@@ -49,9 +62,13 @@ let package = Package(
             name: "Buffer Protocol",
             dependencies: [
                 .target(name: "Buffer"),
+                .product(name: "Cardinal Carrier", package: "swift-cardinal"),
                 .product(name: "Index", package: "swift-index"),
+                .product(name: "Ordinal Protocol", package: "swift-ordinal"),
 
+                .product(name: "Store", package: "swift-store"),
                 .product(name: "Store Protocol", package: "swift-store"),
+                .product(name: "Tagged", package: "swift-tagged"),
             ]
         ),
 
@@ -59,8 +76,15 @@ let package = Package(
             name: "Buffer Test Support",
             dependencies: [
                 .target(name: "Buffer"),
+                .target(name: "Buffer Protocol"),
+                .product(name: "Cardinal Tagged", package: "swift-cardinal"),
+                .product(name: "Store", package: "swift-store"),
                 .product(name: "Store Protocol", package: "swift-store"),
                 .product(name: "Index", package: "swift-index"),
+                .product(
+                    name: "Tagged Standard Library Integration",
+                    package: "swift-tagged"
+                ),
                 .product(
                     name: "Memory",
                     package: "swift-memory"
@@ -73,9 +97,15 @@ let package = Package(
             name: "Buffer Tests",
             dependencies: [
                 .target(name: "Buffer"),
+                .target(name: "Buffer Protocol"),
                 .target(name: "Buffer Test Support"),
+                .product(name: "Cardinal Tagged", package: "swift-cardinal"),
                 .product(name: "Index", package: "swift-index"),
+                .product(name: "Ordinal", package: "swift-ordinal"),
+                .product(name: "Ordinal Protocol", package: "swift-ordinal"),
+                .product(name: "Store", package: "swift-store"),
                 .product(name: "Store Protocol", package: "swift-store"),
+                .product(name: "Tagged", package: "swift-tagged"),
             ]
         ),
     ],

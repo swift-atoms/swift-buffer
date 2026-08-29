@@ -1,7 +1,10 @@
 public import Buffer_Protocol
+internal import Cardinal_Tagged
 
 import Index
+public import Store
 public import Store_Protocol
+internal import Tagged_Standard_Library_Integration
 
 extension Seam {
 
