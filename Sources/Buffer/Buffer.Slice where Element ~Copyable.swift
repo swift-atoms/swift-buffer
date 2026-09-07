@@ -1,4 +1,4 @@
-extension Buffer.Slice where Element: ~Copyable {
+extension Buffer.Slice where S: ~Copyable, Element: ~Copyable {
 
     @inlinable
     public var count: Int { _span.count }

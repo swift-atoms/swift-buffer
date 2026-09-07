@@ -79,7 +79,7 @@ struct `Buffer Storage Slice Capacity Tests` {}
 
 extension `Buffer Storage Slice Capacity Tests` {
     @Suite
-    struct Unit {
+    struct `Unit behavior` {
 
         @Test
         func `Buffer Capacity wraps Index Count, reused not reinvented`() {
@@ -184,7 +184,7 @@ extension `Buffer Storage Slice Capacity Tests` {
 
 extension `Buffer Storage Slice Capacity Tests` {
     @Suite
-    struct Integration {
+    struct `Integration behavior` {
 
         @Test
         func `Buffer Storage over a live Store Protocol conformer composes end-to-end`() {
@@ -195,5 +195,45 @@ extension `Buffer Storage Slice Capacity Tests` {
             #expect(storage.base[slotZero] == 42)
             #expect(storage.capacity.count == Index<Int>.Count(UInt(3)))
         }
+    }
+}
+
+@Suite
+struct `Buffers preserve noncopyable storage and elements` {
+    private struct Payload: ~Copyable {
+        let value: Int
+    }
+
+    @Test
+    func `capacity zero and comparison accept noncopyable storage and elements`() {
+        let zero = Buffer<Payload>.Capacity<Payload>.zero
+        let one = Buffer<Payload>.Capacity<Payload>(1)
+        let two = Buffer<Payload>.Capacity<Payload>(2)
+        #expect(zero.count == .zero)
+        #expect(zero < one)
+        #expect(one < two)
+        #expect(one == one)
+    }
+
+    @Test
+    func `slice access and extraction borrow noncopyable elements`() {
+        var payload = Payload(value: 42)
+        unsafe withUnsafePointer(to: &payload) { pointer in
+            let span = unsafe Span(_unsafeStart: pointer, count: 1)
+            let slice = Buffer<Payload>.Slice(span)
+            let count = slice.count
+            let isEmpty = slice.isEmpty
+            #expect(count == 1)
+            #expect(!isEmpty)
+            let borrowed = slice.span()
+            #expect(borrowed[0].value == 42)
+            let whole = slice.extracting(0..<1)
+            let wholeSpan = whole.span()
+            #expect(wholeSpan[0].value == 42)
+            let empty = slice.extracting(1..<1)
+            let emptyCount = empty.count
+            #expect(emptyCount == 0)
+        }
+        #expect(payload.value == 42)
     }
 }

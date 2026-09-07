@@ -14,3 +14,9 @@ extension Buffer where S: ~Copyable {
         }
     }
 }
+
+extension Buffer.Capacity where S: ~Copyable, Element: ~Copyable {
+
+    @inlinable
+    public static var zero: Self { Self(.zero) }
+}
