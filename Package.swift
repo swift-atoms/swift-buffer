@@ -12,15 +12,10 @@ let package = Package(
         .visionOS(.v27),
     ],
     products: [
-
-        .library(name: "Buffer Protocol", targets: ["Buffer Protocol"]),
-
         .library(name: "Buffer", targets: ["Buffer"]),
-
-        .library(
-            name: "Buffer Test Support",
-            targets: ["Buffer Test Support"]
-        ),
+        .library(name: "Buffer Standard Library Integration", targets: ["Buffer Standard Library Integration"]),
+        .library(name: "Buffer Foundation Library Integration", targets: ["Buffer Foundation Library Integration"]),
+        .library(name: "Buffer Test Support", targets: ["Buffer Test Support"]),
     ],
     dependencies: [
         .package(
@@ -52,68 +47,65 @@ let package = Package(
         ),
     ],
     targets: [
-
         .target(
             name: "Buffer",
-            dependencies: []
+            dependencies: [
+                .product(name: "Cardinal", package: "swift-cardinal"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Ordinal", package: "swift-ordinal"),
+                .product(name: "Store", package: "swift-store"),
+                .product(name: "Tagged", package: "swift-tagged"),
+            ],
+            path: "Sources/Buffer"
         ),
-
         .target(
-            name: "Buffer Protocol",
+            name: "Buffer Standard Library Integration",
             dependencies: [
                 .target(name: "Buffer"),
-                .product(name: "Cardinal Carrier", package: "swift-cardinal"),
-                .product(name: "Index", package: "swift-index"),
-                .product(name: "Ordinal Protocol", package: "swift-ordinal"),
-
-                .product(name: "Store", package: "swift-store"),
-                .product(name: "Store Protocol", package: "swift-store"),
-                .product(name: "Tagged", package: "swift-tagged"),
-            ]
+            ],
+            path: "Sources/Buffer Standard Library Integration"
         ),
-
+        .target(
+            name: "Buffer Foundation Library Integration",
+            dependencies: [
+                .target(name: "Buffer"),
+                .target(name: "Buffer Standard Library Integration"),
+            ],
+            path: "Sources/Buffer Foundation Library Integration"
+        ),
         .target(
             name: "Buffer Test Support",
             dependencies: [
                 .target(name: "Buffer"),
-                .target(name: "Buffer Protocol"),
-                .product(name: "Cardinal Tagged", package: "swift-cardinal"),
+                .product(name: "Cardinal", package: "swift-cardinal"),
                 .product(name: "Store", package: "swift-store"),
-                .product(name: "Store Protocol", package: "swift-store"),
                 .product(name: "Index", package: "swift-index"),
-                .product(
-                    name: "Tagged Standard Library Integration",
-                    package: "swift-tagged"
-                ),
-                .product(
-                    name: "Memory",
-                    package: "swift-memory"
-                ),
+                .product(name: "Tagged Standard Library Integration", package: "swift-tagged"),
+                .product(name: "Memory", package: "swift-memory"),
             ],
             path: "Tests/Support"
         ),
-
         .testTarget(
             name: "Buffer Tests",
             dependencies: [
                 .target(name: "Buffer"),
-                .target(name: "Buffer Protocol"),
                 .target(name: "Buffer Test Support"),
-                .product(name: "Cardinal Tagged", package: "swift-cardinal"),
+                .product(name: "Cardinal", package: "swift-cardinal"),
                 .product(name: "Index", package: "swift-index"),
                 .product(name: "Ordinal", package: "swift-ordinal"),
-                .product(name: "Ordinal Protocol", package: "swift-ordinal"),
                 .product(name: "Store", package: "swift-store"),
-                .product(name: "Store Protocol", package: "swift-store"),
                 .product(name: "Tagged", package: "swift-tagged"),
-            ]
+                .target(name: "Buffer Standard Library Integration"),
+                .target(name: "Buffer Foundation Library Integration"),
+            ],
+            path: "Tests/Buffer Tests"
         ),
     ],
     swiftLanguageModes: [.v6]
 )
 
-for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    let ecosystem: [SwiftSetting] = [
+for target in package.targets {
+    target.swiftSettings = [
         .strictMemorySafety(),
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
@@ -121,12 +113,7 @@ for target in package.targets where ![.system, .binary, .plugin, .macro].contain
         .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
         .enableExperimentalFeature("Lifetimes"),
         .enableUpcomingFeature("InferIsolatedConformances"),
-    ]
-
-    let package: [SwiftSetting] = [
         .enableExperimentalFeature("BuiltinModule"),
         .enableExperimentalFeature("RawLayout"),
     ]
-
-    target.swiftSettings = (target.swiftSettings ?? []) + ecosystem + package
 }

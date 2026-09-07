@@ -1,7 +1,6 @@
-public import Buffer
-public import Cardinal_Carrier
+public import Cardinal
 public import Index
-public import Ordinal_Protocol
+public import Ordinal
 public import Tagged
 
 public protocol __BufferProtocol: ~Copyable, ~Escapable {

@@ -1,5 +1,5 @@
 public import Index
-public import Ordinal_Protocol
+public import Ordinal
 
 extension Buffer where S: ~Copyable {
 

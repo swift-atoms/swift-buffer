@@ -1,5 +1,5 @@
-public import Cardinal_Carrier
-import Ordinal_Protocol
+public import Cardinal
+import Ordinal
 public import Tagged
 
 extension Buffer.Capacity: Comparable {
