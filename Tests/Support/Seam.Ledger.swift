@@ -3,7 +3,7 @@ internal import Cardinal
 
 import Index
 public import Store
-internal import Tagged_Standard_Library_Integration
+internal import Tagged
 
 extension Seam {
 

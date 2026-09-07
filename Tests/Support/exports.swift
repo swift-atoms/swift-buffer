@@ -3,4 +3,4 @@
 @_exported public import Index
 @_exported public import Memory
 @_exported public import Store
-@_exported public import Tagged_Standard_Library_Integration
+@_exported public import Tagged

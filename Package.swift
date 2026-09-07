@@ -13,8 +13,8 @@ let package = Package(
     ],
     products: [
         .library(name: "Buffer", targets: ["Buffer"]),
-        .library(name: "Buffer Standard Library Integration", targets: ["Buffer Standard Library Integration"]),
-        .library(name: "Buffer Foundation Library Integration", targets: ["Buffer Foundation Library Integration"]),
+
+        .library(name: "Buffer Foundation Integration", targets: ["Buffer Foundation Integration"]),
         .library(name: "Buffer Test Support", targets: ["Buffer Test Support"]),
     ],
     dependencies: [
@@ -58,20 +58,13 @@ let package = Package(
             ],
             path: "Sources/Buffer"
         ),
+        
         .target(
-            name: "Buffer Standard Library Integration",
+            name: "Buffer Foundation Integration",
             dependencies: [
                 .target(name: "Buffer"),
             ],
-            path: "Sources/Buffer Standard Library Integration"
-        ),
-        .target(
-            name: "Buffer Foundation Library Integration",
-            dependencies: [
-                .target(name: "Buffer"),
-                .target(name: "Buffer Standard Library Integration"),
-            ],
-            path: "Sources/Buffer Foundation Library Integration"
+            path: "Sources/Buffer Foundation Integration"
         ),
         .target(
             name: "Buffer Test Support",
@@ -80,7 +73,7 @@ let package = Package(
                 .product(name: "Cardinal", package: "swift-cardinal"),
                 .product(name: "Store", package: "swift-store"),
                 .product(name: "Index", package: "swift-index"),
-                .product(name: "Tagged Standard Library Integration", package: "swift-tagged"),
+                .product(name: "Tagged", package: "swift-tagged"),
                 .product(name: "Memory", package: "swift-memory"),
             ],
             path: "Tests/Support"
@@ -95,8 +88,7 @@ let package = Package(
                 .product(name: "Ordinal", package: "swift-ordinal"),
                 .product(name: "Store", package: "swift-store"),
                 .product(name: "Tagged", package: "swift-tagged"),
-                .target(name: "Buffer Standard Library Integration"),
-                .target(name: "Buffer Foundation Library Integration"),
+                .target(name: "Buffer Foundation Integration"),
             ],
             path: "Tests/Buffer Tests"
         ),

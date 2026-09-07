@@ -2,14 +2,6 @@ public import Cardinal
 import Ordinal
 public import Tagged
 
-extension Buffer.Capacity: Comparable {
-
-    @inlinable
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.count < rhs.count
-    }
-}
-
 extension Buffer.Capacity {
 
     @inlinable
