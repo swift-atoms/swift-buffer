@@ -3,6 +3,11 @@ public import Index
 public import Ordinal
 public import Tagged
 
+extension Buffer where S: ~Copyable {
+
+    public typealias `Protocol` = __BufferProtocol
+}
+
 public protocol __BufferProtocol: ~Copyable, ~Escapable {
 
     associatedtype Element: ~Copyable
@@ -12,13 +17,10 @@ public protocol __BufferProtocol: ~Copyable, ~Escapable {
     var isEmpty: Bool { get }
 }
 
-extension __BufferProtocol where Self: ~Copyable & ~Escapable {
+extension Buffer.`Protocol` where Self: ~Copyable & ~Escapable {
 
     @inlinable
     public var isEmpty: Bool { count == .zero }
 }
 
-extension Buffer where S: ~Copyable {
 
-    public typealias `Protocol` = __BufferProtocol
-}
