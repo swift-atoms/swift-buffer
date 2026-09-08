@@ -98,7 +98,7 @@ private struct CapacityDriftingColumn: Store::Store.`Protocol`, Buffer.`Protocol
 }
 
 @Suite
-struct `Seam Ledger Closure Tests` {
+struct `Seam ledger checks accept valid storage and reject count or capacity violations` {
 
     @Test
     func `a lawful reference column passes the seam ledger laws`() {

@@ -75,11 +75,11 @@ extension FixedColumn: Store::Store.`Protocol` {
 }
 
 @Suite
-struct `Buffer Storage Slice Capacity Tests` {}
+struct `Buffers retain storage capacity and preserve sliced element bounds` {}
 
-extension `Buffer Storage Slice Capacity Tests` {
+extension `Buffers retain storage capacity and preserve sliced element bounds` {
     @Suite
-    struct `Unit behavior` {
+    struct `Buffer capacities snapshot storage extents and slices preserve their elements` {
 
         @Test
         func `Buffer Capacity wraps Index Count, reused not reinvented`() {
@@ -136,9 +136,9 @@ extension `Buffer Storage Slice Capacity Tests` {
     }
 }
 
-extension `Buffer Storage Slice Capacity Tests` {
+extension `Buffers retain storage capacity and preserve sliced element bounds` {
     @Suite
-    struct `Edge Case` {
+    struct `Buffers preserve zero capacities and empty or full slices` {
 
         @Test
         func `Buffer Capacity supports the zero-length edge case`() {
@@ -182,9 +182,9 @@ extension `Buffer Storage Slice Capacity Tests` {
     }
 }
 
-extension `Buffer Storage Slice Capacity Tests` {
+extension `Buffers retain storage capacity and preserve sliced element bounds` {
     @Suite
-    struct `Integration behavior` {
+    struct `Buffer storage composes with a live store conformer` {
 
         @Test
         func `Buffer Storage over a live Store Protocol conformer composes end-to-end`() {
