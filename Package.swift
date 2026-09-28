@@ -47,6 +47,23 @@ let package = Package(
         ),
     ],
     targets: [
+        .testTarget(
+            name: "Absorbed swift-buffer-storage Tests",
+            dependencies: [
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Store", package: "swift-store"),
+                .target(name: "Buffer"),
+            ],
+            path: "Tests/Absorbed swift-buffer-storage Tests"
+        ),
+        .testTarget(
+            name: "Absorbed swift-buffer-index Tests",
+            dependencies: [
+                .product(name: "Index", package: "swift-index"),
+                .target(name: "Buffer"),
+            ],
+            path: "Tests/Absorbed swift-buffer-index Tests"
+        ),
         .target(
             name: "Buffer",
             dependencies: [
@@ -58,7 +75,7 @@ let package = Package(
             ],
             path: "Sources/Buffer"
         ),
-        
+
         .target(
             name: "Buffer Foundation Integration",
             dependencies: [
