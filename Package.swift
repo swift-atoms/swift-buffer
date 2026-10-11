@@ -105,7 +105,6 @@ let package = Package(
                 .product(name: "Ordinal", package: "swift-ordinal"),
                 .product(name: "Store", package: "swift-store"),
                 .product(name: "Tagged", package: "swift-tagged"),
-                .target(name: "Buffer Foundation Integration"),
             ],
             path: "Tests/Buffer Tests"
         ),

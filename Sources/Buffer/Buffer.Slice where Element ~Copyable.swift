@@ -8,7 +8,7 @@ extension Buffer.Slice where S: ~Copyable, Element: ~Copyable {
 
     @_lifetime(borrow self)
     @inlinable
-    public borrowing func span() -> Swift.Span<Element> {
+    public borrowing func span() -> Swift::Span<Element> {
         _span
     }
 

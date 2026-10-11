@@ -8,12 +8,14 @@ import Tagged
 import Testing
 
 private struct LawfulColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
-    typealias Element = Int
-
     var slots: [(slot: Index<Int>, element: Int)] = []
     let capacityLimit: Index<Int>.Count
 
     init(capacity: Index<Int>.Count) { self.capacityLimit = capacity }
+}
+
+extension LawfulColumn {
+    typealias Element = Int
 
     var capacity: Index<Int>.Count { capacityLimit }
     var count: Index<Int>.Count { Index<Int>.Count(UInt(slots.count)) }
@@ -46,9 +48,11 @@ private struct LawfulColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
 }
 
 private struct CountLaggingColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
-    typealias Element = Int
-
     var lawful = LawfulColumn(capacity: Index<Int>.Count(UInt(4)))
+}
+
+extension CountLaggingColumn {
+    typealias Element = Int
 
     var capacity: Index<Int>.Count { lawful.capacity }
     var count: Index<Int>.Count {
@@ -73,10 +77,12 @@ private struct CountLaggingColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
 }
 
 private struct CapacityDriftingColumn: Store::Store.`Protocol`, Buffer.`Protocol` {
-    typealias Element = Int
-
     var lawful = LawfulColumn(capacity: Index<Int>.Count(UInt(4)))
     var operations: UInt = 0
+}
+
+extension CapacityDriftingColumn {
+    typealias Element = Int
 
     var capacity: Index<Int>.Count { Index<Int>.Count(UInt(4) + operations) }
     var count: Index<Int>.Count { lawful.count }
