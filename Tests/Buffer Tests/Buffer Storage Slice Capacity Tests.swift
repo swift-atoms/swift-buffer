@@ -218,7 +218,7 @@ struct `Buffers preserve noncopyable storage and elements` {
     @Test
     func `slice access and extraction borrow noncopyable elements`() {
         var payload = Payload(value: 42)
-        unsafe withUnsafePointer(to: &payload) { pointer in
+        withUnsafePointer(to: &payload) { pointer in
             let span = unsafe Span(_unsafeStart: pointer, count: 1)
             let slice = Buffer<Payload>.Slice(span)
             let count = slice.count
