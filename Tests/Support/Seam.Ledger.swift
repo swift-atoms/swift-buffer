@@ -1,6 +1,5 @@
 public import Buffer
 internal import Cardinal
-
 import Index
 public import Store
 internal import Tagged
@@ -35,29 +34,41 @@ extension Seam.Ledger {
 
         column.initialize(at: slot0, to: element(0))
         if column.count != one {
-            found.append("law 1: initialize(at:to:) must increment count by one (got \(column.count), expected 1)")
+            found.append(
+                "law 1: initialize(at:to:) must increment count by one (got \(column.count), expected 1)"
+            )
         }
         column.initialize(at: slot1, to: element(1))
         if column.count != two {
-            found.append("law 1: initialize(at:to:) must increment count by one (got \(column.count), expected 2)")
+            found.append(
+                "law 1: initialize(at:to:) must increment count by one (got \(column.count), expected 2)"
+            )
         }
 
         column[slot0] = element(2)
         if column.count != two {
-            found.append("law 2: the element subscript must leave count unchanged (got \(column.count), expected 2)")
+            found.append(
+                "law 2: the element subscript must leave count unchanged (got \(column.count), expected 2)"
+            )
         }
 
         _ = column.move(at: slot1)
         if column.count != one {
-            found.append("law 3: move(at:) must decrement count by one (got \(column.count), expected 1)")
+            found.append(
+                "law 3: move(at:) must decrement count by one (got \(column.count), expected 1)"
+            )
         }
         _ = column.move(at: slot0)
         if column.count != zero {
-            found.append("law 3: move(at:) must decrement count by one (got \(column.count), expected 0)")
+            found.append(
+                "law 3: move(at:) must decrement count by one (got \(column.count), expected 0)"
+            )
         }
 
         if column.capacity != capacityBefore {
-            found.append("law 4: seam element ops must not change capacity (was \(capacityBefore), now \(column.capacity))")
+            found.append(
+                "law 4: seam element ops must not change capacity (was \(capacityBefore), now \(column.capacity))"
+            )
         }
         return found
     }

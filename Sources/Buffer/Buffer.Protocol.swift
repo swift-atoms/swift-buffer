@@ -22,5 +22,3 @@ extension Buffer.`Protocol` where Self: ~Copyable & ~Escapable {
     @inlinable
     public var isEmpty: Bool { count == .zero }
 }
-
-

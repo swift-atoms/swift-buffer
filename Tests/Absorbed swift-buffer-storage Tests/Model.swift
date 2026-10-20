@@ -115,7 +115,9 @@ extension Model {
         #elseif os(Windows)
             var pointer: UnsafeMutablePointer<CChar>? = nil
             var count = 0
-            guard unsafe _dupenv_s(&pointer, &count, name) == 0, let pointer = unsafe pointer else { return nil }
+            guard unsafe _dupenv_s(&pointer, &count, name) == 0, let pointer = unsafe pointer else {
+                return nil
+            }
             defer { unsafe free(pointer) }
             return unsafe String(validatingCString: pointer)
         #else
