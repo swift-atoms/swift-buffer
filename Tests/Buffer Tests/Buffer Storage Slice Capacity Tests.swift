@@ -74,10 +74,14 @@ extension FixedColumn: Store::Store.`Protocol` {
     }
 }
 
-@Suite
-struct `Buffers retain storage capacity and preserve sliced element bounds` {}
+enum `Buffer Storage Slice Capacity Tests` {}
 
-extension `Buffers retain storage capacity and preserve sliced element bounds` {
+extension `Buffer Storage Slice Capacity Tests` {
+    @Suite
+    struct `Buffers retain storage capacity and preserve sliced element bounds` {}
+}
+
+extension `Buffer Storage Slice Capacity Tests`.`Buffers retain storage capacity and preserve sliced element bounds` {
     @Suite
     struct `Buffer capacities snapshot storage extents and slices preserve their elements` {
 
@@ -136,7 +140,7 @@ extension `Buffers retain storage capacity and preserve sliced element bounds` {
     }
 }
 
-extension `Buffers retain storage capacity and preserve sliced element bounds` {
+extension `Buffer Storage Slice Capacity Tests`.`Buffers retain storage capacity and preserve sliced element bounds` {
     @Suite
     struct `Buffers preserve zero capacities and empty or full slices` {
 
@@ -182,7 +186,7 @@ extension `Buffers retain storage capacity and preserve sliced element bounds` {
     }
 }
 
-extension `Buffers retain storage capacity and preserve sliced element bounds` {
+extension `Buffer Storage Slice Capacity Tests`.`Buffers retain storage capacity and preserve sliced element bounds` {
     @Suite
     struct `Buffer storage composes with a live store conformer` {
 
@@ -198,42 +202,44 @@ extension `Buffers retain storage capacity and preserve sliced element bounds` {
     }
 }
 
-@Suite
-struct `Buffers preserve noncopyable storage and elements` {
-    private struct Payload: ~Copyable {
-        let value: Int
-    }
-
-    @Test
-    func `capacity zero and comparison accept noncopyable storage and elements`() {
-        let zero = Buffer<Payload>.Capacity<Payload>.zero
-        let one = Buffer<Payload>.Capacity<Payload>(1)
-        let two = Buffer<Payload>.Capacity<Payload>(2)
-        #expect(zero.count == .zero)
-        #expect(zero < one)
-        #expect(one < two)
-        #expect(one == one)
-    }
-
-    @Test
-    func `slice access and extraction borrow noncopyable elements`() {
-        var payload = Payload(value: 42)
-        withUnsafePointer(to: &payload) { pointer in
-            let span = unsafe Span(_unsafeStart: pointer, count: 1)
-            let slice = Buffer<Payload>.Slice(span)
-            let count = slice.count
-            let isEmpty = slice.isEmpty
-            #expect(count == 1)
-            #expect(!isEmpty)
-            let borrowed = slice.span()
-            #expect(borrowed[0].value == 42)
-            let whole = slice.extracting(0..<1)
-            let wholeSpan = whole.span()
-            #expect(wholeSpan[0].value == 42)
-            let empty = slice.extracting(1..<1)
-            let emptyCount = empty.count
-            #expect(emptyCount == 0)
+extension `Buffer Storage Slice Capacity Tests` {
+    @Suite
+    struct `Buffers preserve noncopyable storage and elements` {
+        private struct Payload: ~Copyable {
+            let value: Int
         }
-        #expect(payload.value == 42)
+
+        @Test
+        func `capacity zero and comparison accept noncopyable storage and elements`() {
+            let zero = Buffer<Payload>.Capacity<Payload>.zero
+            let one = Buffer<Payload>.Capacity<Payload>(1)
+            let two = Buffer<Payload>.Capacity<Payload>(2)
+            #expect(zero.count == .zero)
+            #expect(zero < one)
+            #expect(one < two)
+            #expect(one == one)
+        }
+
+        @Test
+        func `slice access and extraction borrow noncopyable elements`() {
+            var payload = Payload(value: 42)
+            withUnsafePointer(to: &payload) { pointer in
+                let span = unsafe Span(_unsafeStart: pointer, count: 1)
+                let slice = Buffer<Payload>.Slice(span)
+                let count = slice.count
+                let isEmpty = slice.isEmpty
+                #expect(count == 1)
+                #expect(!isEmpty)
+                let borrowed = slice.span()
+                #expect(borrowed[0].value == 42)
+                let whole = slice.extracting(0..<1)
+                let wholeSpan = whole.span()
+                #expect(wholeSpan[0].value == 42)
+                let empty = slice.extracting(1..<1)
+                let emptyCount = empty.count
+                #expect(emptyCount == 0)
+            }
+            #expect(payload.value == 42)
+        }
     }
 }

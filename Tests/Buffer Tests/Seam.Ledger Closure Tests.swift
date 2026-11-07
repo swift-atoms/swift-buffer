@@ -103,51 +103,55 @@ extension CapacityDriftingColumn {
     }
 }
 
-@Suite
-struct `Seam ledger checks accept valid storage and reject count or capacity violations` {
+enum `Seam.Ledger Closure Tests` {}
 
-    @Test
-    func `a lawful reference column passes the seam ledger laws`() {
-        let violations = Seam.Ledger.violations(
-            makeEmpty: { LawfulColumn(capacity: Index<Int>.Count(UInt(4))) },
-            element: { $0 }
-        )
-        #expect(violations.isEmpty, "\(violations)")
-    }
+extension `Seam.Ledger Closure Tests` {
+    @Suite
+    struct `Seam ledger checks accept valid storage and reject count or capacity violations` {
 
-    @Test
-    func `a lawful column at the boundary capacity of exactly two passes the seam ledger laws`() {
-        let violations = Seam.Ledger.violations(
-            makeEmpty: { LawfulColumn(capacity: Index<Int>.Count(UInt(2))) },
-            element: { $0 }
-        )
-        #expect(violations.isEmpty, "\(violations)")
-    }
+        @Test
+        func `a lawful reference column passes the seam ledger laws`() {
+            let violations = Seam.Ledger.violations(
+                makeEmpty: { LawfulColumn(capacity: Index<Int>.Count(UInt(4))) },
+                element: { $0 }
+            )
+            #expect(violations.isEmpty, "\(violations)")
+        }
 
-    @Test
-    func `the ledger rejects a column below the minimum capacity precondition`() {
-        let violations = Seam.Ledger.violations(
-            makeEmpty: { LawfulColumn(capacity: Index<Int>.Count(UInt(1))) },
-            element: { $0 }
-        )
-        #expect(!violations.isEmpty)
-    }
+        @Test
+        func `a lawful column at the boundary capacity of exactly two passes the seam ledger laws`() {
+            let violations = Seam.Ledger.violations(
+                makeEmpty: { LawfulColumn(capacity: Index<Int>.Count(UInt(2))) },
+                element: { $0 }
+            )
+            #expect(violations.isEmpty, "\(violations)")
+        }
 
-    @Test
-    func `the ledger catches a column whose initialize fails to increment count`() {
-        let violations = Seam.Ledger.violations(
-            makeEmpty: { CountLaggingColumn() },
-            element: { $0 }
-        )
-        #expect(!violations.isEmpty)
-    }
+        @Test
+        func `the ledger rejects a column below the minimum capacity precondition`() {
+            let violations = Seam.Ledger.violations(
+                makeEmpty: { LawfulColumn(capacity: Index<Int>.Count(UInt(1))) },
+                element: { $0 }
+            )
+            #expect(!violations.isEmpty)
+        }
 
-    @Test
-    func `the ledger catches a column whose seam ops drift capacity`() {
-        let violations = Seam.Ledger.violations(
-            makeEmpty: { CapacityDriftingColumn() },
-            element: { $0 }
-        )
-        #expect(!violations.isEmpty)
+        @Test
+        func `the ledger catches a column whose initialize fails to increment count`() {
+            let violations = Seam.Ledger.violations(
+                makeEmpty: { CountLaggingColumn() },
+                element: { $0 }
+            )
+            #expect(!violations.isEmpty)
+        }
+
+        @Test
+        func `the ledger catches a column whose seam ops drift capacity`() {
+            let violations = Seam.Ledger.violations(
+                makeEmpty: { CapacityDriftingColumn() },
+                element: { $0 }
+            )
+            #expect(!violations.isEmpty)
+        }
     }
 }
