@@ -1,6 +1,6 @@
+public import Cardinal
 public import Index
 public import Ordinal
-public import Cardinal
 public import Tagged
 
 extension Buffer where S: ~Copyable {
