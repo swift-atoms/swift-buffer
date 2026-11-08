@@ -81,10 +81,12 @@ extension FixedColumn: Store::Store.`Protocol` {
     }
 }
 
-@Suite
-struct `Buffer Storage Tests` {}
+extension `Buffer Storage Tests`.`Buffer Storage Tests` {
+    @Suite
+    struct `Buffer Storage Tests` {}
+}
 
-extension `Buffer Storage Tests` {
+extension `Buffer Storage Tests`.`Buffer Storage Tests` {
     @Suite
     struct Unit {
 
@@ -112,7 +114,7 @@ extension `Buffer Storage Tests` {
     }
 }
 
-extension `Buffer Storage Tests` {
+extension `Buffer Storage Tests`.`Buffer Storage Tests` {
     @Suite
     struct `Edge Case` {
 
@@ -127,7 +129,7 @@ extension `Buffer Storage Tests` {
     }
 }
 
-extension `Buffer Storage Tests` {
+extension `Buffer Storage Tests`.`Buffer Storage Tests` {
     @Suite
     struct Integration {
 
